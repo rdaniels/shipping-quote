@@ -1,5 +1,9 @@
-require "shipping_gem/version"
+# require "shipping_gem/version"
 
 module ShippingGem
-  # Your code goes here...
+  class Shipping
+    def self.hi
+      puts "Hello World!"
+    end
+  end
 end
