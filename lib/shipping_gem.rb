@@ -2,8 +2,19 @@
 
 module ShippingGem
   class Shipping
+
+    def initialize
+      @output = {}
+    end
+
     def self.hi
-      puts "Hello World!"
+      "Hello World!"
+    end
+
+    def self.create_packages
+      @packages = []
+
+
     end
   end
 end
