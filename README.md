@@ -8,7 +8,7 @@ Reference from another program with: require 'shipping-quote'
 
 Add this line to your application's Gemfile:
 
-    gem 'shippingquote'
+    gem 'shipping-quote'
 
 And then execute:
 
