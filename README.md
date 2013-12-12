@@ -1,14 +1,14 @@
-# ShippingGem
+# ShippingQuote
 
 Produces shipping quotes and boxing charges based on the Daniels Corporation shipping algorithm.
 Generate the Gem file with: gem build example_gem.gemspec
-Reference from another program with: require 'shipping_gem'
+Reference from another program with: require 'shipping-quote'
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'shipping_gem'
+    gem 'shippingquote'
 
 And then execute:
 
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install shipping_gem
+    $ gem install shipping-quote
 
 ## Usage
 
