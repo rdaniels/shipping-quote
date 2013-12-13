@@ -20,7 +20,10 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Update values in /config/shipping-quote.yml
+Pry sometimes crashes when called from Vagrant : RSpec, use run-shipping-quote for pry debugging instead
+
+
 
 ## Contributing
 
