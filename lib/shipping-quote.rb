@@ -2,6 +2,7 @@
 require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
+require 'yaml'
 
 module ShippingQuote
 
@@ -35,11 +36,17 @@ module ShippingQuote
 
 
   class Shipping
+    attr_accessor :boxing_charge
 
     def initialize(cart_items)
       @cart_items = cart_items
       @cart_items = [] if cart_items == nil
       @config = { box_max_weight: 25, box_lead_weight: 31 }
+      begin
+        @config = YAML::load(IO.read("#{RAILS_ENV}/config/shipping-quote.yml"))
+      rescue
+        #log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
+      end
     end
 
 
@@ -83,6 +90,8 @@ module ShippingQuote
 
       # lead
       @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead_box == 1
+
+      @boxing_charge = 1
 
       @packages
     end

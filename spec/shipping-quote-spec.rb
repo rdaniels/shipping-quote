@@ -55,6 +55,15 @@ module ShippingQuote
         ship = Shipping.new(cart_items)
         expect(ship.create_packages).to have(1).packages
       end
+
+      it 'boxing charge = 1' do
+        item.stub(:shipCode).and_return('LEA')
+        (0..Random.rand(3...20)).each { |i| cart_items[i] = item }
+        #puts cart_items.length
+        ship = Shipping.new(cart_items)
+        ship.create_packages
+        expect(ship.boxing_charge).to eq(1)
+      end
     end
 
 

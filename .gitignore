@@ -4,6 +4,7 @@
 .config
 .yardoc
 .idea
+.vagrant
 Gemfile.lock
 InstalledFiles
 _yardoc
@@ -17,3 +18,4 @@ test/tmp
 test/version_tmp
 tmp
 package.box
+Vagrantfile
