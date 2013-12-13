@@ -6,8 +6,16 @@ module ShippingQuote
     # let(:output) { double('output').as_null_object }
     # let(:shipping) { Shipping.new }
 
-    let(:cart_items) { [] }
-    let(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1 ) }
+    let!(:cart_items) { [] }
+    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10 ) }
+    config = { box_max_weight: 25,
+                          box_lead_weight: 31,
+                          add_boxing_charge: false,
+                          lead_box_charge: 5,
+                          sm_glass_box_charge: 8,
+                          lg_glass_box_charge: 8,
+                          dichro_box_charge: 5,
+                          first_glass_box_extra_charge: 7 }
 
     #TODO: refactor out ship=Shipping.new(cart_items)
     #before(:all) do
@@ -48,21 +56,37 @@ module ShippingQuote
         expect(ship.create_packages).to have(2).packages
       end
 
+      it '1 special order item + 1 UPS item under box max weight returns 2 package' do
+        cart_items[0] = item
+        item.stub(:backorder).and_return(21)
+        cart_items[1] = item
+        ship = Shipping.new(cart_items)
+        expect(ship.create_packages).to have(2).packages
+      end
+
+      it '2 special order items + 1 UPS item under box max weight returns 2 package' do
+        cart_items[0] = item
+        item.stub(:backorder).and_return(21)
+        cart_items[1] = item
+        cart_items[2] = item
+        ship = Shipping.new(cart_items)
+        expect(ship.create_packages).to have(2).packages
+      end
+
       it 'random number of lead items returns 1 package' do
         item.stub(:shipCode).and_return('LEA')
         (0..Random.rand(3...20)).each { |i| cart_items[i] = item }
-        #puts cart_items.length
         ship = Shipping.new(cart_items)
         expect(ship.create_packages).to have(1).packages
       end
+    end
 
-      it 'boxing charge = 1' do
-        item.stub(:shipCode).and_return('LEA')
-        (0..Random.rand(3...20)).each { |i| cart_items[i] = item }
-        #puts cart_items.length
-        ship = Shipping.new(cart_items)
-        ship.create_packages
-        expect(ship.boxing_charge).to eq(1)
+
+    describe 'boxing charges' do
+      it 'returns single glass boxing charge' do
+        config[:add_boxing_charge] = true
+        ship = Shipping.new(cart_items, config)
+        expect(ship.calculate_boxing(0,1,0)).to eq(config[:first_glass_box_extra_charge] + config[:sm_glass_box_charge])
       end
     end
 
@@ -83,3 +107,4 @@ module ShippingQuote
     end
   end
 end
+

@@ -2,46 +2,26 @@
 require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
-require 'yaml'
+#require 'yaml'
 
 module ShippingQuote
 
-  # Configuration defaults
-  @config = { :box_max_weight => 25 }
-  @valid_config_keys = @config.keys
-
-  #TODO: setup path_to_yaml_file
-
-  # Configure through hash
-  def self.configure(opts = {})
-    opts.each {|k,v| @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym}
-  end
-
-  # Configure through yaml file
-  def self.configure_with(path_to_yaml_file)
-    begin
-      config = YAML::load(IO.read(path_to_yaml_file))
-    rescue Errno::ENOENT
-      log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
-    rescue Psych::SyntaxError
-      log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
-    end
-
-    configure(config)
-  end
-
-  def self.config
-    @config
-  end
-
-
   class Shipping
-    attr_accessor :boxing_charge
+    attr_accessor :boxing_charge, :config
 
-    def initialize(cart_items)
+    def initialize(cart_items, config = nil)
+
       @cart_items = cart_items
       @cart_items = [] if cart_items == nil
-      @config = { box_max_weight: 25, box_lead_weight: 31 }
+      config == nil ? @config = { box_max_weight: 25,
+                  box_lead_weight: 31,
+                  add_boxing_charge: false,
+                  lead_box_charge: 5,
+                  sm_glass_box_charge: 8,
+                  lg_glass_box_charge: 8,
+                  dichro_box_charge: 5,
+                  first_glass_box_extra_charge: 7 } : @config = config
+
       begin
         @config = YAML::load(IO.read("#{RAILS_ENV}/config/shipping-quote.yml"))
       rescue
@@ -50,10 +30,8 @@ module ShippingQuote
     end
 
 
-    def create_packages
+    def create_packages()
       @packages = []
-      @boxing_charge = 0
-      @truck_only = 0
 
       regular_item_weight = 0
       glass_pieces = 0
@@ -91,10 +69,20 @@ module ShippingQuote
       # lead
       @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead_box == 1
 
-      @boxing_charge = 1
-
+      # special order
+      full_vendor_boxes = 0
+      special_order = @cart_items.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
+      special_order.group_by { |item| item.vendor }.each do |s|
+        box_weight = 0
+        s[1].each { |i| box_weight += i.weight }
+        full_vendor_boxes += (box_weight / @config[:box_max_weight]).to_i
+        partial_vendor_box = box_weight - full_vendor_boxes
+        @packages << Package.new((partial_vendor_box * 16), [5, 5, 5], :units => :imperial) if partial_vendor_box > 0
+      end
+      (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
       @packages
     end
+
 
     def truck_only
       @cart_items.each do |item|
@@ -102,6 +90,17 @@ module ShippingQuote
           return 1 if shipCode == 'TRK'
       end
       return 0
+    end
+
+    def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
+      boxing_charge = 0
+       if @config[:add_boxing_charge] == true
+        boxing_charge += @config[:lead_box_charge] if add_lead_box == 1
+        boxing_charge += @config[:first_glass_box_extra_charge] if glass_boxes > 0 # $15 for first glass box, $8 each additional
+        boxing_charge += (glass_boxes * @config[:sm_glass_box_charge])
+        boxing_charge += (dichro_boxes * @config[:dichro_box_charge])
+      end
+      boxing_charge
     end
 
   end

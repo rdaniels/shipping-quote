@@ -2,6 +2,18 @@
 $LOAD_PATH.unshift File.expand_path('./lib', __FILE__)
 require './lib/shipping-quote'
 
-quote = ShippingQuote::Shipping.new(nil)
+cart_items = []
+item = { shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0 }
+cart_items[0] = item
+config = {box_max_weight: 25,
+    box_lead_weight: 31,
+    add_boxing_charge: true,
+    lead_box_charge: 5,
+    sm_glass_box_charge: 8,
+    lg_glass_box_charge: 8,
+    dichro_box_charge: 5,
+    first_glass_box_extra_charge: 7}
+
+quote = ShippingQuote::Shipping.new(cart_items, config)
 # binding.pry
-quote.create_packages
+puts quote.calculate_boxing(0,1,0)
