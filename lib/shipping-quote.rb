@@ -13,32 +13,38 @@ module ShippingQuote
 
       @cart_items = cart_items
       @cart_items = [] if cart_items == nil
-      config == nil ? @config = { box_max_weight: 25,
-                  box_lead_weight: 31,
-                  add_boxing_charge: false,
-                  lead_box_charge: 5,
-                  sm_glass_box_charge: 8,
-                  lg_glass_box_charge: 8,
-                  dichro_box_charge: 5,
-                  first_glass_box_extra_charge: 7 } : @config = config
+      @config = config
 
       begin
-        @config = YAML::load(IO.read("#{RAILS_ENV}/config/shipping-quote.yml"))
+        @config = YAML::load(IO.read("#{RAILS_ENV}/config/shipping-quote.yml")) if @config == nil
       rescue
         #log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
       end
+
+    end
+
+
+    def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
+      #binding.pry
+      boxing_charge = 0
+      if @config[:add_boxing_charge] == true
+        boxing_charge += @config[:lead_box_charge] if add_lead_box == 1
+        boxing_charge += @config[:first_glass_box_extra_charge] if glass_boxes > 0 # $15 for first glass box, $8 each additional
+        boxing_charge += (glass_boxes * @config[:sm_glass_box_charge])
+        boxing_charge += (dichro_boxes * @config[:dichro_box_charge])
+      end
+      boxing_charge
     end
 
 
     def create_packages()
       @packages = []
-
+#binding.pry
       regular_item_weight = 0
       glass_pieces = 0
       dichro_pieces = 0
       add_lead_box = 0
 
-      #binding.pry
       @cart_items.each do |item|
         (item.shipCode == nil) ? shipCode = '' : shipCode = item.shipCode.upcase
 
@@ -66,7 +72,7 @@ module ShippingQuote
       partial_item_box = regular_item_weight - (full_item_boxes * @config[:box_max_weight])
       @packages << Package.new((partial_item_box * 16), [5, 5, 5], :units => :imperial) if partial_item_box > 0
 
-      # lead
+      # lead8
       @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead_box == 1
 
       # special order
@@ -84,6 +90,18 @@ module ShippingQuote
     end
 
 
+    def quotes(destination, packages)
+      fedex = FedEx.new(login: config[:fedex][:login], password: config[:fedex][:password],
+                        key: config[:fedex][:key], account: config[:fedex][:account], meter: config[:fedex][:meter])
+      origin = Location.new(config[:origin])
+      location_destination = Location.new(destination)
+      response = fedex.find_rates(origin, location_destination, packages)
+      @fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
+
+      @fedex_rates
+    end
+
+
     def truck_only
       @cart_items.each do |item|
         (item.shipCode == nil) ? shipCode = '' : shipCode = item.shipCode.upcase
@@ -92,16 +110,7 @@ module ShippingQuote
       return 0
     end
 
-    def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
-      boxing_charge = 0
-       if @config[:add_boxing_charge] == true
-        boxing_charge += @config[:lead_box_charge] if add_lead_box == 1
-        boxing_charge += @config[:first_glass_box_extra_charge] if glass_boxes > 0 # $15 for first glass box, $8 each additional
-        boxing_charge += (glass_boxes * @config[:sm_glass_box_charge])
-        boxing_charge += (dichro_boxes * @config[:dichro_box_charge])
-      end
-      boxing_charge
-    end
+
 
   end
 end

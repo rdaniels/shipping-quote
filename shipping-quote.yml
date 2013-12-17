@@ -1,4 +1,22 @@
 
 # diamondtech settings
-box_max_weight: 25,
-box_lead_weight: 31
+
+:box_max_weight: 25,
+:box_lead_weight: 31,
+:add_boxing_charge: false,
+:lead_box_charge: 5,
+:sm_glass_box_charge: 8,
+:lg_glass_box_charge: 8,
+:dichro_box_charge: 5,
+:first_glass_box_extra_charge: 7,
+:fedex: 
+    :login: '123456789'
+    :password: 'YourPasswordHere'
+    :key: 'YourKeyHere'
+    :account: '123456789'
+    :meter: '123456789'
+:origin: 
+    country: 'US',
+    state: 'FL
+    city: 'Tampa'
+    zip: '33634' 

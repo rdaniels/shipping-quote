@@ -3,17 +3,30 @@ $LOAD_PATH.unshift File.expand_path('./lib', __FILE__)
 require './lib/shipping-quote'
 
 cart_items = []
-item = { shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0 }
+class StubItem
+  def shipCode; 'UPS';   end
+  def isGlass;  end
+  def qty;  1;  end
+  def weight; 1;  end
+  def backorder; 0;  end
+  def vendor; 10;  end
+end
+class StubCustomer
+  def country; 'US'; end
+  def city; 'Tampa'; end
+  def state; 'FL' end
+  def zip; '33609'; end
+end
+item = StubItem.new #{ shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10 }
 cart_items[0] = item
-config = {box_max_weight: 25,
-    box_lead_weight: 31,
-    add_boxing_charge: true,
-    lead_box_charge: 5,
-    sm_glass_box_charge: 8,
-    lg_glass_box_charge: 8,
-    dichro_box_charge: 5,
-    first_glass_box_extra_charge: 7}
+config = YAML::load(IO.read("./shipping-quote-spec.yml"))
+puts config
 
-quote = ShippingQuote::Shipping.new(cart_items, config)
-# binding.pry
-puts quote.calculate_boxing(0,1,0)
+ship = ShippingQuote::Shipping.new(cart_items, config)
+
+
+puts ship.calculate_boxing(0, 1, 0)
+
+destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
+packages = ship.create_packages
+puts ship.quotes(destination,packages)
