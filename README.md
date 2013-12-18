@@ -1,11 +1,11 @@
 # ShippingQuote
 
-Produces shipping quotes and boxing charges based on the Daniels Corporation shipping algorithm.
+Produces FedEx and USPS shipping quotes with boxing charges based on the Daniels Corporation shipping algorithm.
 Generate the Gem file with: gem build example_gem.gemspec
-Reference from another program with: require 'shipping-quote'
 
 ## Installation
 
+Update values in shipping-quote.yml and place in your RAILS_ENV/config folder.
 Add this line to your application's Gemfile:
 
     gem 'shipping-quote'
@@ -19,8 +19,21 @@ Or install it yourself as:
     $ gem install shipping-quote
 
 ## Usage
+    require 'shipping-quote'
 
-Update values in /config/shipping-quote.yml
+    ship = Shipping.new(cart_items)
+    packages = ship.create_packages
+    quote = ship.quotes(destination,packages)
+
+cart_items is and array of items
+example item (all fields required) {shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10}
+example destination { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
+
+
+## Development
+
+For development, copy shipping-quote.yml to shipping-quote-spec.yml and update values. Add tests to
+shipping-quote-spec.rb before adding code to shipping-quote.rb.
 Pry sometimes crashes when called from Vagrant : RSpec, use run-shipping-quote for pry debugging instead
 
 

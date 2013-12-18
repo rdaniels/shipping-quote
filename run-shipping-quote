@@ -10,23 +10,28 @@ class StubItem
   def weight; 1;  end
   def backorder; 0;  end
   def vendor; 10;  end
+  def ormd; nil; end
 end
 class StubCustomer
+  def street; '1234 Fake Street'; end
+  def street2; nil end
   def country; 'US'; end
   def city; 'Tampa'; end
   def state; 'FL' end
   def zip; '33609'; end
 end
 item = StubItem.new #{ shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10 }
+c = StubCustomer.new
 cart_items[0] = item
 config = YAML::load(IO.read("./shipping-quote-spec.yml"))
-puts config
+# puts config
 
 ship = ShippingQuote::Shipping.new(cart_items, config)
 
 
-puts ship.calculate_boxing(0, 1, 0)
+# puts ship.calculate_boxing(0, 1, 0)
 
-destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
+destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
 packages = ship.create_packages
-puts ship.quotes(destination,packages)
+quotes = ship.quotes(destination,packages)
+puts ship.filter_shipping(quotes, c.street, c.street2 )

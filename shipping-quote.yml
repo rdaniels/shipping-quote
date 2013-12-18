@@ -9,14 +9,47 @@
 :lg_glass_box_charge: 8,
 :dichro_box_charge: 5,
 :first_glass_box_extra_charge: 7,
+:rate_multiplier: 1.08,
 :fedex: 
     :login: '123456789'
     :password: 'YourPasswordHere'
     :key: 'YourKeyHere'
     :account: '123456789'
     :meter: '123456789'
+:usps:
+  :login: 'YourUSPSLogin'
 :origin: 
     country: 'US',
     state: 'FL
     city: 'Tampa'
-    zip: '33634' 
+    zip: '33634'
+:shown_rates:
+    - FedEx Ground
+    - FedEx Ground Home Delivery
+    - FedEx Express Saver
+    - FedEx 2 Day
+    - FedEx Standard Overnight
+    - USPS Priority Mail
+    - USPS Priority Mail 1-Day
+    - USPS Priority Mail 2-Day
+    - USPS Priority Mail 3-Day
+    - USPS Priority Mail 4-Day
+    - USPS Priority Mail 5-Day
+    - USPS Priority Mail Express
+    - USPS Priority Mail Express 1-Day
+    - USPS Priority Mail Express 2-Day
+    - USPS Priority Mail Express 3-Day
+    - USPS Priority Mail Express 4-Day
+    - USPS Priority Mail Express 5-Day
+    - USPS Express Mail
+    - USPS Express Mail 1-Day
+    - USPS Express Mail 2-Day
+    - USPS Express Mail 3-Day
+    - USPS Express Mail 4-Day
+    - USPS Express Mail 5-Day
+    - USPS Priority Mail International
+    - USPS Express Mail International
+    # - USPS Standard Post
+    # - USPS Media Mail
+    # - FedEx International Economy
+    # - FedEx International Priority

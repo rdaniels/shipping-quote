@@ -6,27 +6,22 @@ module ShippingQuote
     # let(:output) { double('output').as_null_object }
     # let(:shipping) { Shipping.new }
 
+    config = YAML::load(IO.read("./shipping-quote-spec.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10) }
+    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil) }
     let!(:destination) {
       {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
     }
-    config = YAML::load(IO.read("./shipping-quote-spec.yml"))
 
-    #TODO: refactor out ship=Shipping.new(cart_items)
-    #before(:all) do
-    #  ship = Shipping.new(cart_items)
-    #end
 
-    describe 'pull rate quotes' do
-      it 'returns at least 1 rate' do
-
-        cart_items[0] = item
+    describe 'boxing charges' do
+      it 'returns single glass boxing charge' do
+        config[:add_boxing_charge] = true
         ship = Shipping.new(cart_items, config)
-        packages = ship.create_packages
-        expect(ship.quotes(destination,packages)).to have_at_least(1).fedex_rates
+        expect(ship.calculate_boxing(0, 1, 0)).to eq(config[:first_glass_box_extra_charge] + config[:sm_glass_box_charge])
       end
     end
+
 
     describe 'create packages' do
       it 'nil returns no packages' do
@@ -54,7 +49,7 @@ module ShippingQuote
         expect(ship.create_packages).to have(1).packages
       end
 
-      it '2 UPS items over box max weight returns 2 package' do
+      it '2 UPS items over box max weight returns 2 packages' do
         item.stub(:weight).and_return(20)
         cart_items[0] = item
         cart_items[1] = item
@@ -88,16 +83,40 @@ module ShippingQuote
     end
 
 
-    describe 'boxing charges' do
-      it 'returns single glass boxing charge' do
-        config[:add_boxing_charge] = true
+    describe 'filter shipping' do
+      it 'returns at least 1 rate' do
+        cart_items[0] = item
         ship = Shipping.new(cart_items, config)
-        expect(ship.calculate_boxing(0, 1, 0)).to eq(config[:first_glass_box_extra_charge] + config[:sm_glass_box_charge])
+        packages = ship.create_packages
+        quotes = ship.quotes(destination,packages)
+        expect(ship.filter_shipping(quotes)).to have_at_least(1).rate
       end
     end
 
 
-    describe 'truck only check' do
+    describe 'quotes' do
+      it 'returns at least 1 rate' do
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = ship.create_packages
+        expect(ship.quotes(destination,packages)).to have_at_least(1).rate
+      end
+      it 'returns fedex express saver, home ground, and usps standard' do
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = ship.create_packages
+        quote = ship.quotes(destination,packages)
+        has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+        has_ground = quote.select{|key, value| key.to_s.match(/^FedEx Ground Home Delivery/)}
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Standard Post/)}
+        expect(has_express).to have(1).rates
+        expect(has_ground).to have(1).rates
+        expect(has_usps).to have(1).rates
+      end
+    end
+
+
+    describe 'truck only' do
       it 'UPS item returns truck_only as 0' do
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
