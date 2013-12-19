@@ -5,12 +5,13 @@ require './lib/shipping-quote'
 cart_items = []
 class StubItem
   def shipCode; 'UPS';   end
-  def isGlass;  end
+  def isGlass; 1;  end
   def qty;  1;  end
-  def weight; 1;  end
+  def weight; 20;  end
   def backorder; 0;  end
   def vendor; 10;  end
   def ormd; nil; end
+  def glassConverter; nil; end
 end
 class StubCustomer
   def street; '1234 Fake Street'; end
@@ -23,15 +24,23 @@ end
 item = StubItem.new #{ shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10 }
 c = StubCustomer.new
 cart_items[0] = item
+cart_items[1] = item
+cart_items[2] = item
 config = YAML::load(IO.read("./shipping-quote-spec.yml"))
-# puts config
-
-ship = ShippingQuote::Shipping.new(cart_items, config)
-
-
-# puts ship.calculate_boxing(0, 1, 0)
-
 destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
+
+config[:add_boxing_charge] = true
+ship = ShippingQuote::Shipping.new(cart_items, config)
 packages = ship.create_packages
-quotes = ship.quotes(destination,packages)
-puts ship.filter_shipping(quotes, c.street, c.street2 )
+quote = ship.quotes(destination,packages)
+has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+binding.pry
+
+
+
+#quotes = ship.quotes(destination,packages)
+#truck_only = ship.truck_only
+#puts truck_only
+#packages = ship.create_packages
+#quotes = ship.quotes(destination,packages)
+#puts results = ship.filter_shipping(quotes, nil, nil, truck_only)

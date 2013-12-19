@@ -7,7 +7,7 @@ include ActiveMerchant::Shipping
 module ShippingQuote
 
   class Shipping
-    attr_accessor :boxing_charge, :config, :notes
+    attr_accessor :boxing_charge, :config, :notes, :truck_only
 
     def initialize(cart_items, config = nil)
       @cart_items = cart_items
@@ -23,7 +23,15 @@ module ShippingQuote
     end
 
 
-    def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes, truck_only = 0)
+    def run_shipping_quote
+
+    end
+
+    def boxing_charge
+      @boxing
+    end
+
+    def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
       boxing_charge = 0
 
       if glass_boxes > 6 || truck_only == 1
@@ -76,6 +84,21 @@ module ShippingQuote
       # lead8
       @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead_box == 1
 
+
+      # glass
+      glass_boxes = (glass_pieces.to_f / 6).ceil
+      if glass_pieces > 0
+        glass_box_weight = 48
+        (1..glass_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
+      end
+
+      # dichro
+      dichro_boxes = (dichro_pieces.to_f / 6).ceil
+      if dichro_pieces > 0
+        glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
+        (1..dichro_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
+      end
+
       # special order
       full_vendor_boxes = 0
       special_order = @cart_items.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
@@ -88,11 +111,12 @@ module ShippingQuote
       end
       (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
 
+      @boxing = calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
       @packages
     end
 
 
-    def filter_shipping(quotes, street=nil, street2=nil, truck_only=0, ship_selected=nil )
+    def filter_shipping(quotes, street=nil, street2=nil, ship_selected=nil )
       count_glass = 0
       shown_rates = []
       @cart_items.each do |item|
@@ -170,6 +194,9 @@ module ShippingQuote
       all_rates
     end
 
+    def notes
+      @notes
+    end
 
     def truck_only
       @cart_items.each do |item|
