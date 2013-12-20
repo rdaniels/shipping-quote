@@ -27,14 +27,20 @@ module ShippingQuote
       cp.create_packages
     end
 
-    def filter_shipping(quotes, street=nil, street2=nil, ship_selected=nil )
+    def filter_shipping(quotes, destination, ship_selected=nil )
       quote = Quote.new(@cart_items, @config, truck_only)
-      quote.filter_shipping(quotes, street, street2, ship_selected )
+      quote.filter_shipping(quotes, destination, ship_selected )
     end
 
     def quotes(destination, packages)
       quote = Quote.new(@cart_items, @config, truck_only)
       quote.quotes(destination, packages)
+    end
+
+    def runner(destination, ship_selected=nil)
+      packages = create_packages
+      quotes = quotes(destination,packages)
+      filter_shipping(quotes, destination, ship_selected)
     end
 
     def truck_only

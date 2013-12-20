@@ -25,27 +25,14 @@ class CreatePackages
   def create_packages
     @packages = []
     regular_item_weight = 0
-    glass_pieces = 0
-    dichro_pieces = 0
-    add_lead_box = 0
 
     @cart_items.each do |item|
-      (item.shipCode == nil) ? shipCode = '' : shipCode = item.shipCode.upcase
-
-      glass_pieces += item.qty * 2 if item.isGlass == 1 && (item.glassConverter == nil || item.glassConverter == 0)
-      glass_pieces += item.qty * item.glassConverter if item.isGlass == 1 && (item.glassConverter != nil && item.glassConverter > 0)
-      dichro_pieces += item.qty if item.isGlass == 3
-
+      item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
       if item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2
         if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
           (1..item.qty).each { @packages << Package.new((item.weight * 16), [5, 5, 5], :units => :imperial) }
-        else
-          if shipCode == 'LEA'
-            add_lead_box = 1
-          else
-            # backorder = -1 normal item out of stock, purchaseCode for special order (2, 20+), 999 truck item
-            regular_item_weight += item.weight * item.qty #if item.backorder == 0
-          end
+        elsif shipCode != 'LEA'
+            regular_item_weight += item.weight * item.qty
         end
       end
     end
@@ -56,25 +43,50 @@ class CreatePackages
     partial_item_box = regular_item_weight - (full_item_boxes * @config[:box_max_weight])
     @packages << Package.new((partial_item_box * 16), [5, 5, 5], :units => :imperial) if partial_item_box > 0
 
-    # lead8
-    @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead_box == 1
+    add_lead_box = lead_packages
+    glass_boxes = glass_packages
+    dichro_boxes = dichro_packages
+    special_order
+
+    @boxing = calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
+    @packages
+  end
 
 
-    # glass
+  def lead_packages
+    add_lead = @cart_items.select { |item| item.shipCode.upcase == 'LEA' }.length > 0 ? 1 : 0
+    @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead == 1
+    add_lead
+  end
+
+  def glass_packages
+    glass_pieces = 0
+    @cart_items.each do |item|
+      glass_pieces += item.qty * 2 if item.isGlass == 1 && (item.glassConverter == nil || item.glassConverter == 0)
+      glass_pieces += item.qty * item.glassConverter if item.isGlass == 1 && (item.glassConverter != nil && item.glassConverter > 0)
+    end
     glass_boxes = (glass_pieces.to_f / 6).ceil
     if glass_pieces > 0
-      glass_box_weight = 48
+      glass_box_weight = @config[:box_glass_weight]
       (1..glass_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
     end
+    glass_boxes
+  end
 
-    # dichro
+
+  def dichro_packages
+    dichro_pieces = 0
+    @cart_items.each { |item| dichro_pieces += item.qty if item.isGlass == 3 }
     dichro_boxes = (dichro_pieces.to_f / 6).ceil
     if dichro_pieces > 0
       glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
       (1..dichro_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
     end
+    dichro_boxes
+  end
 
-    # special order
+
+  def special_order
     full_vendor_boxes = 0
     special_order = @cart_items.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
     special_order.group_by { |item| item.vendor }.each do |s|
@@ -85,9 +97,7 @@ class CreatePackages
       @packages << Package.new((partial_vendor_box * 16), [5, 5, 5], :units => :imperial) if partial_vendor_box > 0
     end
     (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
-
-    @boxing = calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
-    @packages
+    return nil
   end
 
 

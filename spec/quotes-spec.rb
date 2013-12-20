@@ -9,9 +9,7 @@ module ShippingQuote
     config = YAML::load(IO.read("./shipping-quote-spec.yml"))
     let!(:cart_items) { [] }
     let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
-    let!(:destination) {
-      {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
-    }
+    let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
 
 
     describe 'filter shipping' do
@@ -20,7 +18,7 @@ module ShippingQuote
         ship = Shipping.new(cart_items, config)
         packages = ship.create_packages
         quotes = ship.quotes(destination,packages)
-        results = ship.filter_shipping(quotes)
+        results = ship.filter_shipping(quotes, destination)
         has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
         has_usps = results.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
@@ -35,7 +33,7 @@ module ShippingQuote
         truck_only = ship.truck_only
         packages = ship.create_packages
         quotes = ship.quotes(destination,packages)
-        results = ship.filter_shipping(quotes)
+        results = ship.filter_shipping(quotes, destination)
         expect(results).to have(1).rate
         has_truck = results.select{|key, value| key.to_s.match(/^Truck Shipping/)}
         expect(has_truck).to have(1).rate
@@ -46,13 +44,34 @@ module ShippingQuote
         ship = Shipping.new(cart_items, config)
         packages = ship.create_packages
         quotes = ship.quotes(destination,packages)
-        results = ship.filter_shipping(quotes)
+        results = ship.filter_shipping(quotes, destination)
         has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
         has_usps = results.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
         expect(has_express).to have(0).rates
         expect(has_ground).to have_at_least(1).rates
         expect(has_usps).to have(0).rates
+      end
+      it 'returns multiple quotes for Canada' do
+        destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = ship.create_packages
+        quotes = ship.quotes(destination,packages)
+        results = ship.filter_shipping(quotes, destination)
+        expect(results).to have_at_least(2).rates
+      end
+      it 'removes all fedex if po.box address' do
+        destination[:street] = 'P.O. Box 1234'
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        results = ship.runner(destination)
+        has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+        has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        has_usps = results.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
+        expect(has_express).to have(0).rates
+        expect(has_ground).to have(0).rates
+        expect(has_usps).to have_at_least(1).rates
       end
     end
 
@@ -71,6 +90,25 @@ module ShippingQuote
         expect(has_usps).to have(1).rates
       end
       it 'quote without boxing code less than quote with boxing charge' do
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = ship.create_packages
+        quote = ship.quotes(destination,packages)
+        has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+        express_quote = has_express[0][1]
+
+        destination[:province] = 'CA'
+        destination[:city] = 'Industry',
+        destination[:postal_code] = '91745'
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = ship.create_packages
+        quote = ship.quotes(destination,packages)
+        has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+        express_quote_ca = has_express[0][1]
+        expect(express_quote).to be < express_quote_ca
+      end
+      it 'quote to FL less than quote to California' do
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         packages = ship.create_packages

@@ -9,7 +9,7 @@ class Quote
 
 
 
-  def filter_shipping(quotes, street=nil, street2=nil, ship_selected=nil )
+  def filter_shipping(quotes, destination, ship_selected=nil )
     count_glass = 0
     shown_rates = []
     @cart_items.each do |item|
@@ -39,8 +39,8 @@ class Quote
       shown_rates.collect! { |rate| (rate[0] == 'FedEx Ground Home Delivery') ? ['FedEx Ground', rate[1]] : rate }
 
       is_po_box = 0
-      is_po_box = 1 if street != nil && ['p.o', 'po box', 'p o box'].any? { |w| street.to_s.downcase =~ /#{w}/ }
-      is_po_box = 1 if street2 != nil && ['p.o', 'po box', 'p o box'].any? { |w| street2.to_s.downcase =~ /#{w}/ }
+      is_po_box = 1 if destination[:street] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street].to_s.downcase =~ /#{w}/ }
+      is_po_box = 1 if destination[:street2] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street2].to_s.downcase =~ /#{w}/ }
       shown_rates.delete_if { |rate| rate[0][0..4] == 'FedEx' } if is_po_box == 1
 
       # mode 1 = FedEx, mode 2 = USPS, mode 3 = both

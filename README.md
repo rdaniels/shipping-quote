@@ -14,46 +14,40 @@ the entire cart.
 Update values in shipping-quote.yml and place in your RAILS_ENV/config folder.
 Add this line to your application's Gemfile:
 
-    gem 'shipping-quote'
+    gem 'shipping-quote', :github => 'rdaniels/shipping-quote'
 
 And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install shipping-quote
 
 ## Usage
     require 'shipping-quote'
 
     ship = Shipping.new(cart_items)
-    packages = ship.create_packages
-    quote = ship.quotes(destination,packages)
+    quotes = ship.runner(destination)
+
 
 cart_items is and array of items
 
-example item (all fields required) `{shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10}`
+example item (all fields required) `{ shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil}`
 
-example destination `{ :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}`
+example destination `{ :country => 'US', :street => '1234 fake street', :street2 => nil, :province => 'FL', :city => 'Tampa', :postal_code => '33609'}`
 
 backordered items are grouped together and quoted as 1 box per vendor
 
-ShippingQuote also can add extra 'boxing charges' for select items
+optional extra 'boxing charges' for select items
+
+all FedEx quotes removed if customer has PO Box in destination street or street 2
+
+all air options removed if any item has ormd = 1 (hazardous material)
+
 
 
 ## Development
 
 For development, copy shipping-quote.yml to shipping-quote-spec.yml and update values. Add tests to
 shipping-quote-spec.rb before adding code to shipping-quote.rb.
-Pry sometimes crashes when called from Vagrant : RSpec, use run-shipping-quote for pry debugging instead
 
 
 
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request

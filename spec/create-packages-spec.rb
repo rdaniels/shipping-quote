@@ -8,7 +8,8 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-spec.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item2) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:destination) {
       {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
     }
@@ -50,9 +51,11 @@ module ShippingQuote
         expect(ship.create_packages).to have(1).packages
       end
 
-      it 'multiple UPS items under box max weight returns 1 package' do
+      it '4 UPS items under box max weight returns 1 package' do
         cart_items[0] = item
         cart_items[1] = item
+        cart_items[2] = item
+        cart_items[3] = item
         ship = Shipping.new(cart_items, config)
         expect(ship.create_packages).to have(1).packages
       end
@@ -61,6 +64,15 @@ module ShippingQuote
         item.stub(:weight).and_return(20)
         cart_items[0] = item
         cart_items[1] = item
+        ship = Shipping.new(cart_items, config)
+        expect(ship.create_packages).to have(2).packages
+      end
+
+      it '3 UPS items over box max weight returns 2 packages' do
+        cart_items[0] = item2
+        cart_items[1] = item2
+        cart_items[2] = item
+
         ship = Shipping.new(cart_items, config)
         expect(ship.create_packages).to have(2).packages
       end
