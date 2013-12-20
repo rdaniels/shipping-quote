@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'shipping-quote/version'
+# require 'shipping-quote/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'shipping-quote'
-  spec.version       = '0.0.2'
+  spec.version       = '0.0.3'
   spec.date          = '2013-12-11'
   spec.authors       = ['Rob Daniels']
   spec.email         = %w(rob@danielscorporation.com)
