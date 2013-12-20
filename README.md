@@ -27,12 +27,32 @@ And then execute:
     ship = Shipping.new(cart_items)
     quotes = ship.runner(destination)
 
+runner also takes an optional ship_selected argument, used to filter on repull
 
-cart_items is and array of items
+cart_items is an array of items
 
-example item (all fields required) `{ shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil}`
+example item
 
-example destination `{ :country => 'US', :street => '1234 fake street', :street2 => nil, :province => 'FL', :city => 'Tampa', :postal_code => '33609'}`
+    {   shipCode: 'UPS',
+        isGlass: nil,
+        qty: 1,
+        weight: 1,
+        backorder: 0,
+        vendor: 10,
+        ormd: nil,
+        glassConverter: nil  }
+
+example destination
+
+    {   :country => 'US',
+        :street => '1234 fake street',
+        :street2 => nil,
+        :province => 'FL',
+        :city => 'Tampa',
+        :postal_code => '33609'}
+
+
+## Shipping Rules
 
 backordered items are grouped together and quoted as 1 box per vendor
 
@@ -43,6 +63,40 @@ all FedEx quotes removed if customer has PO Box in destination street or street 
 all air options removed if any item has ormd = 1 (hazardous material)
 
 
+
+## RSpec Passed Tests
+
+    $ sudo rspec spec/*
+
+    ShippingQuote::Shipping
+      quotes
+        quote without boxing code less than quote with boxing charge
+        returns fedex express saver, home ground, and usps standard
+        quote to FL less than quote to California
+      filter shipping
+        returns truck option only if item has shipCode = TRK
+        returns multiple quotes for Canada
+        only returns ground when ormd
+        returns fedex express saver, home ground, and usps standard
+        removes all fedex if po.box address
+      truck only
+        TRK item returns truck_only as 1
+        UPS item returns truck_only as 0
+
+    ShippingQuote::Shipping
+      create packages
+        2 special order items + 1 UPS item under box max weight returns 2 package
+        single UPS item under box max weight returns 1 package
+        random number of lead items returns 1 package
+        4 UPS items under box max weight returns 1 package
+        SHA item returns 1 package
+        1 special order item + 1 UPS item under box max weight returns 2 package
+        2 UPS items over box max weight returns 2 packages
+        nil returns no packages
+        3 UPS items over box max weight returns 2 packages
+      boxing charges
+        adds boxing charge from create packages
+        returns single glass boxing charge
 
 ## Development
 

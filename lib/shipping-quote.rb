@@ -1,5 +1,6 @@
-require './lib/shipping-quote/initialize'
-require './lib/shipping-quote/create-packages'
-require './lib/shipping-quote/quotes'
+require 'active_shipping'
+require_relative  'shipping-quote/initialize'
+require_relative  'shipping-quote/create-packages'
+require_relative  'shipping-quote/quotes'
 
 
