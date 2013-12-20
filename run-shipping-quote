@@ -32,9 +32,11 @@ destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_c
 config[:add_boxing_charge] = true
 ship = ShippingQuote::Shipping.new(cart_items, config)
 packages = ship.create_packages
-quote = ship.quotes(destination,packages)
-has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+boxing = ship.boxing_charge
 binding.pry
+#quote = ship.quotes(destination,packages)
+#has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+
 
 
 
