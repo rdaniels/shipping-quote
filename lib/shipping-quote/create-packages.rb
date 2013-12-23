@@ -54,7 +54,7 @@ class CreatePackages
 
 
   def lead_packages
-    add_lead = @cart_items.select { |item| item.shipCode.upcase == 'LEA' }.length > 0 ? 1 : 0
+    add_lead = @cart_items.select { |item| item.shipCode != nil && item.shipCode.upcase == 'LEA' }.length > 0 ? 1 : 0
     @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead == 1
     add_lead
   end
@@ -88,7 +88,7 @@ class CreatePackages
 
   def special_order
     full_vendor_boxes = 0
-    special_order = @cart_items.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
+    special_order = @cart_items.select { |item| item.vendor != nil && (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
     special_order.group_by { |item| item.vendor }.each do |s|
       box_weight = 0
       s[1].each { |i| box_weight += i.weight }

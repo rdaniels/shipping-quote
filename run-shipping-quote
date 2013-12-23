@@ -5,22 +5,22 @@ config = YAML::load(IO.read("./shipping-quote-spec.yml"))
 
 cart_items = []
 class StubItem
-  def shipCode; 'UPS';   end
-  def isGlass; 0;  end
+  def shipCode; nil;   end
+  def isGlass; nil;  end
   def qty;  1;  end
   def weight; 20;  end
-  def backorder; 0;  end
-  def vendor; 10;  end
+  def backorder; 21;  end
+  def vendor; nil;  end
   def ormd; nil; end
   def glassConverter; nil; end
 end
 class StubItem2
-  def shipCode; 'UPS';   end
-  def isGlass; 0;  end
+  def shipCode; nil;   end
+  def isGlass; nil;  end
   def qty;  1;  end
   def weight; 2;  end
-  def backorder; 0;  end
-  def vendor; 10;  end
+  def backorder; nil;  end
+  def vendor; nil;  end
   def ormd; nil; end
   def glassConverter; nil; end
 end
@@ -33,15 +33,22 @@ class StubCustomer
   def zip; '33609'; end
 end
 
+#TODO: handle missing shipcode
+#  @cart_items => [#<CartItem id: 143, cartID: 10783, custID: 34, creationDate: "2013-12-21 11:15:00", item: 214392, ref01: "801005",
+#     name: "Electric Mandrel Spinner Petite", qty: 1, isGlass: 0, breakGroup: "214392", breakGroupTotal: 1, fullPrice: #<BigDecimal:a560630,'0.11679E3',18(18)>,
+#     cartPrice: #<BigDecimal:a560428,'0.11679E3',18(18)>, backorder: 1, status: nil, couponCode: nil>,
+#     #<CartItem id: 142, cartID: 10783, custID: 34, creationDate: "2013-12-21 11:07:00", item: 212782, ref01: "2000", name: "Precision 2000 Hobby Saw", qty: 1,
+#     isGlass: 0, breakGroup: "212782", breakGroupTotal: 1, fullPrice: #<BigDecimal:a5600e0,'0.22E3',9(18)>, cartPrice: #<BigDecimal:a560068,'0.22E3',9(18)>,
+#     backorder: 1, status: nil, couponCode: nil>]
+
 item = StubItem.new
 c = StubCustomer.new
 cart_items[0] = item
-cart_items[1] = item
-item2 = StubItem2.new
-cart_items[2] = item2
-#destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
-destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
-
+#cart_items[1] = item
+#item2 = StubItem2.new
+#cart_items[2] = item2
+destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
+#destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
 config[:add_boxing_charge] = true
 ship = ShippingQuote::Shipping.new(cart_items, config)

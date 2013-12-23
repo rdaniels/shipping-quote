@@ -38,6 +38,15 @@ module ShippingQuote
         expect(ship.create_packages).to be == []
       end
 
+      it 'nil allowed in vendor and shipCode for special order item' do
+        item.stub(:shipCode).and_return(nil)
+        item.stub(:vendor).and_return(nil)
+        item.stub(:backorder).and_return(21)
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        expect(ship.create_packages).to have(1).packages
+      end
+
       it 'SHA item returns 1 package' do
         item.stub(:shipCode).and_return('SHA')
         cart_items[0] = item
