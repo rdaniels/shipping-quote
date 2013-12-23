@@ -27,12 +27,16 @@ class CreatePackages
     regular_item_weight = 0
 
     @cart_items.each do |item|
+      item.backorder == nil ? backorder = 0 : backorder = item.backorder
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
       if item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2
         if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
           (1..item.qty).each { @packages << Package.new((item.weight * 16), [5, 5, 5], :units => :imperial) }
         elsif shipCode != 'LEA'
+          if backorder == 2 || (backorder > 20 && backorder < 300)
+          else
             regular_item_weight += item.weight * item.qty
+          end
         end
       end
     end
@@ -88,15 +92,21 @@ class CreatePackages
 
   def special_order
     full_vendor_boxes = 0
-    special_order = @cart_items.select { |item| item.vendor != nil && (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
-    special_order.group_by { |item| item.vendor }.each do |s|
-      box_weight = 0
-      s[1].each { |i| box_weight += i.weight }
-      full_vendor_boxes += (box_weight / @config[:box_max_weight]).to_i
-      partial_vendor_box = box_weight - full_vendor_boxes
-      @packages << Package.new((partial_vendor_box * 16), [5, 5, 5], :units => :imperial) if partial_vendor_box > 0
+    special_order = @cart_items.select { |item| item.backorder != nil }
+    special_order = special_order.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
+
+    #binding.pry
+    if special_order.length > 0
+      special_order.group_by { |item| item.vendor if defined? item.vendor }.each do |s|
+        box_weight = 0
+        s[1].each { |i| box_weight += i.weight }
+        full_vendor_boxes += (box_weight / @config[:box_max_weight]).to_i
+        partial_vendor_box = box_weight - full_vendor_boxes
+        @packages << Package.new((partial_vendor_box * 16), [5, 5, 5], :units => :imperial) if partial_vendor_box > 0
+      end
+
+      (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
     end
-    (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
     return nil
   end
 

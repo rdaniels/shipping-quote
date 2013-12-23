@@ -3,8 +3,12 @@ require 'active_shipping'
 include ActiveMerchant::Shipping
 
 class Quote
+  attr_accessor :notes
+
+
   def initialize(cart_items, config, truck_only)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
+    @notes = []
   end
 
 
@@ -53,7 +57,13 @@ class Quote
       #@cart_items.each { |item| no_usps = 1 if item.weight > 70 && skip_states.include?(c.state.downcase) }
 
       ormd = 0
-      @cart_items.each { |item| ormd = 1 if item.ormd != nil && item.ormd > 0 }
+      @cart_items.each do |item|
+        if defined? item.ormd
+          if item.ormd != nil && item.ormd > 0
+            ormd = 1
+          end
+        end
+      end
       shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd == 1
       shown_rates
 

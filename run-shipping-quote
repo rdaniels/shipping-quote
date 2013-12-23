@@ -11,8 +11,8 @@ class StubItem
   def weight; 20;  end
   def backorder; 21;  end
   def vendor; nil;  end
-  def ormd; nil; end
-  def glassConverter; nil; end
+  #def ormd; nil; end
+  #def glassConverter; nil; end
 end
 class StubItem2
   def shipCode; nil;   end
@@ -21,8 +21,8 @@ class StubItem2
   def weight; 2;  end
   def backorder; nil;  end
   def vendor; nil;  end
-  def ormd; nil; end
-  def glassConverter; nil; end
+  #def ormd; nil; end
+  #def glassConverter; nil; end
 end
 class StubCustomer
   def street; '1234 Fake Street'; end
@@ -42,9 +42,10 @@ end
 #     backorder: 1, status: nil, couponCode: nil>]
 
 item = StubItem.new
+item2 = StubItem2.new
 c = StubCustomer.new
 cart_items[0] = item
-#cart_items[1] = item
+cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
 destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}

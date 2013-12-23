@@ -39,7 +39,7 @@ module ShippingQuote
       end
 
       it 'nil allowed in vendor and shipCode for special order item' do
-        item.stub(:shipCode).and_return(nil)
+        #item.stub(:shipCode).and_return(nil)
         item.stub(:vendor).and_return(nil)
         item.stub(:backorder).and_return(21)
         cart_items[0] = item
@@ -86,16 +86,16 @@ module ShippingQuote
         expect(ship.create_packages).to have(2).packages
       end
 
-      it '1 special order item + 1 UPS item under box max weight returns 2 package' do
+      it '1 special order item + 1 UPS item under box max weight returns 2 packages' do
         cart_items[0] = item
         item.stub(:backorder).and_return(21)
-        cart_items[1] = item
+        cart_items[1] = item2
         ship = Shipping.new(cart_items, config)
         expect(ship.create_packages).to have(2).packages
       end
 
-      it '2 special order items + 1 UPS item under box max weight returns 2 package' do
-        cart_items[0] = item
+      it '2 special order items + 1 UPS item under box max weight returns 2 packages' do
+        cart_items[0] = item2
         item.stub(:backorder).and_return(21)
         cart_items[1] = item
         cart_items[2] = item
