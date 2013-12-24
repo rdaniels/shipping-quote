@@ -7,11 +7,13 @@ module ShippingQuote
       @cart_items = [] if cart_items == nil
       @config = config
 
-      begin
-        @config = YAML::load(IO.read("#{RAILS_ENV}/config/shipping-quote.yml")) if @config == nil
-      rescue
-        #log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
-      end
+      @config = YAML::load(IO.read("#{Rails.root}/config/shipping-quote.yml")) if @config == nil
+
+      #begin
+      #  @config = YAML::load(IO.read("#{Rails.root}/config/shipping-quote.yml")) if @config == nil
+      #rescue
+      #  log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
+      #end
 
       #TODO: repace !defined?  for missing methods with global handler in initialize
       # @cart_items.extend(ItemMethods)

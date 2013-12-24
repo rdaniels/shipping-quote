@@ -24,8 +24,9 @@ And then execute:
 ## Usage
     require 'shipping-quote'
 
-    ship = Shipping.new(cart_items)
-    quotes = ship.runner(destination)
+    ship = ShippingQuote::Shipping.new(@cart_items)
+    @shown_rates = ship.runner(@c)  #@c = ship_to
+    @boxing_charge = ship.boxing_charge
 
 runner also takes an optional ship_selected argument, used to filter on repull
 
