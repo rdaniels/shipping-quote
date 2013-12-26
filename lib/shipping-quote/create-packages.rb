@@ -22,6 +22,11 @@ class CreatePackages
   end
 
 
+  def add_packages(qty, weight)
+    (1..qty).each { @packages << Package.new((weight * 16), [5, 5, 5], :units => :imperial) }
+  end
+
+
   def create_packages
     @packages = []
     regular_item_weight = 0
@@ -31,7 +36,7 @@ class CreatePackages
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
       if item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2
         if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
-          (1..item.qty).each { @packages << Package.new((item.weight * 16), [5, 5, 5], :units => :imperial) }
+          add_packages(item.qty, item.weight)
         elsif shipCode != 'LEA'
           if backorder == 2 || (backorder > 20 && backorder < 300)
           else
@@ -43,9 +48,9 @@ class CreatePackages
 
     # regular items
     full_item_boxes = (regular_item_weight.to_f / @config[:box_max_weight]).to_i
-    (1..full_item_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
+    add_packages(full_item_boxes, @config[:box_max_weight])
     partial_item_box = regular_item_weight - (full_item_boxes * @config[:box_max_weight])
-    @packages << Package.new((partial_item_box * 16), [5, 5, 5], :units => :imperial) if partial_item_box > 0
+    add_packages(1, partial_item_box) if partial_item_box > 0
 
     add_lead_box = lead_packages
     glass_boxes = glass_packages
@@ -59,7 +64,7 @@ class CreatePackages
 
   def lead_packages
     add_lead = @cart_items.select { |item| item.shipCode != nil && item.shipCode.upcase == 'LEA' }.length > 0 ? 1 : 0
-    @packages << Package.new((@config[:box_lead_weight] * 16), [5, 5, 5], :units => :imperial) if add_lead == 1
+    add_packages(1, @config[:box_lead_weight]) if add_lead == 1
     add_lead
   end
 
@@ -72,7 +77,7 @@ class CreatePackages
     glass_boxes = (glass_pieces.to_f / 6).ceil
     if glass_pieces > 0
       glass_box_weight = @config[:box_glass_weight]
-      (1..glass_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
+      add_packages(glass_boxes, glass_box_weight)
     end
     glass_boxes
   end
@@ -84,7 +89,7 @@ class CreatePackages
     dichro_boxes = (dichro_pieces.to_f / 6).ceil
     if dichro_pieces > 0
       glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
-      (1..dichro_boxes).each { @packages << Package.new((glass_box_weight * 16), [5, 5, 5], :units => :imperial) }
+      add_packages(dichro_boxes, glass_box_weight)
     end
     dichro_boxes
   end
@@ -102,10 +107,9 @@ class CreatePackages
         s[1].each { |i| box_weight += i.weight }
         full_vendor_boxes += (box_weight / @config[:box_max_weight]).to_i
         partial_vendor_box = box_weight - full_vendor_boxes
-        @packages << Package.new((partial_vendor_box * 16), [5, 5, 5], :units => :imperial) if partial_vendor_box > 0
+        add_packages(1, partial_vendor_box) if partial_vendor_box > 0
       end
-
-      (1..full_vendor_boxes).each { @packages << Package.new((@config[:box_max_weight] * 16), [5, 5, 5], :units => :imperial) }
+      add_packages(full_vendor_boxes, @config[:box_max_weight])
     end
     return nil
   end

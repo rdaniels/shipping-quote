@@ -11,7 +11,7 @@ class StubItem
   def weight; 20;  end
   def backorder; 21;  end
   def vendor; nil;  end
-  #def ormd; nil; end
+  def ormd; 1; end
   #def glassConverter; nil; end
 end
 class StubItem2
@@ -21,7 +21,7 @@ class StubItem2
   def weight; 2;  end
   def backorder; nil;  end
   def vendor; nil;  end
-  #def ormd; nil; end
+  def ormd; nil; end
   #def glassConverter; nil; end
 end
 class StubCustomer

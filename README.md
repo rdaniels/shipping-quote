@@ -43,7 +43,7 @@ example item
         ormd: nil,
         glassConverter: nil  }
 
-example destination
+example ship_to
 
     {   :country => 'US',
         :street => '1234 fake street',

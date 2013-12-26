@@ -12,10 +12,8 @@ class Quote
   end
 
 
-
-  def filter_shipping(quotes, destination, ship_selected=nil )
+  def pull_glass_count
     count_glass = 0
-    shown_rates = []
     @cart_items.each do |item|
       if item.isGlass == 1
         multiplier = 2
@@ -23,7 +21,13 @@ class Quote
         count_glass += (item.qty * multiplier)
       end
     end
+    count_glass
+  end
 
+
+  def filter_shipping(quotes, destination, ship_selected=nil )
+    shown_rates = []
+    count_glass = pull_glass_count
 
     if count_glass > 18 || @truck_only == 1
       shown_rates << ['Truck Shipping', 0]
@@ -56,25 +60,34 @@ class Quote
       #skip_states = %w{ap ae ak hi pr vi}
       #@cart_items.each { |item| no_usps = 1 if item.weight > 70 && skip_states.include?(c.state.downcase) }
 
-      ormd = 0
-      @cart_items.each do |item|
-        if defined? item.ormd
-          if item.ormd != nil && item.ormd > 0
-            ormd = 1
-          end
-        end
-      end
-      shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd == 1
+      ormd = check_ormd
+      shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd > 0
       shown_rates
 
     end
   end
 
+  def check_ormd
+    ormd_items = @cart_items
+      .find_all { |item| defined? item.ormd }
+      .find_all { |item| item.ormd != nil && item.ormd > 0 }
+    ormd_items.length
+  end
+
   def quotes(destination, packages)
-    fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password],
-                      key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
     origin = Location.new(@config[:origin])
     location_destination = Location.new(destination)
+    fedex_rates = pull_fedex(origin, location_destination, packages)
+    usps_rates = pull_usps(origin, location_destination, packages)
+
+    all_rates = fedex_rates + usps_rates
+    all_rates.each { |line| line[1] = (line[1] * @config[:rate_multiplier].to_f).round(0) }
+    all_rates
+  end
+
+  def pull_fedex (origin, location_destination, packages)
+    fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password],
+                      key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
     begin
       response = fedex.find_rates(origin, location_destination, packages)
       fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
@@ -82,7 +95,11 @@ class Quote
       fedex_rates = []
       @notes << 'FedEx ' + error.response.message
     end
+    fedex_rates
+  end
 
+
+  def pull_usps (origin, location_destination, packages)
     usps = USPS.new(login: @config[:usps][:login])
     begin
       response = usps.find_rates(origin, location_destination, packages)
@@ -91,11 +108,9 @@ class Quote
       usps_rates = []
       @notes << 'USPS ' + error.response.message
     end
-
-    all_rates = fedex_rates + usps_rates
-    all_rates.each { |line| line[1] = (line[1] * @config[:rate_multiplier].to_f).round(0) }
-    all_rates
+    usps_rates
   end
+
 
   def notes
     @notes

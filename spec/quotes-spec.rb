@@ -139,7 +139,7 @@ module ShippingQuote
       it 'TRK item returns truck_only as 1' do
         item.stub(:shipCode).and_return('TRK')
         cart_items[0] = item
-        ship = Shipping.new(cart_items)
+        ship = Shipping.new(cart_items, config)
         expect(ship.truck_only).to be == 1
       end
     end
