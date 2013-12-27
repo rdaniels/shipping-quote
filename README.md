@@ -34,7 +34,8 @@ cart_items is an array of items
 
 example item
 
-    {   shipCode: 'UPS',
+    {   ref01: '3000',
+        shipCode: 'UPS',
         isGlass: nil,
         qty: 1,
         weight: 1,
@@ -70,34 +71,42 @@ all air options removed if any item has ormd = 1 (hazardous material)
     $ sudo rspec spec/*
 
     ShippingQuote::Shipping
-      quotes
-        quote without boxing code less than quote with boxing charge
-        returns fedex express saver, home ground, and usps standard
-        quote to FL less than quote to California
-      filter shipping
-        returns truck option only if item has shipCode = TRK
-        returns multiple quotes for Canada
-        only returns ground when ormd
-        returns fedex express saver, home ground, and usps standard
-        removes all fedex if po.box address
-      truck only
-        TRK item returns truck_only as 1
-        UPS item returns truck_only as 0
+      boxing charges
+        returns single glass boxing charge
+        adds boxing charge from create packages
+      create packages
+        single UPS item under box max weight returns 1 package
+        nil returns no packages
+        4 UPS items under box max weight returns 1 package
+        1 special order item + 1 UPS item under box max weight returns 2 packages
+        returns missing item weight in note and no packages
+        nil allowed in vendor and shipCode for special order item
+        2 special order items + 1 UPS item under box max weight returns 2 packages
+        3 UPS items over box max weight returns 2 packages
+        2 UPS items over box max weight returns 2 packages
+        random number of lead items returns 1 package
+        SHA item returns 1 package
 
     ShippingQuote::Shipping
-      create packages
-        2 special order items + 1 UPS item under box max weight returns 2 package
-        single UPS item under box max weight returns 1 package
-        random number of lead items returns 1 package
-        4 UPS items under box max weight returns 1 package
-        SHA item returns 1 package
-        1 special order item + 1 UPS item under box max weight returns 2 package
-        2 UPS items over box max weight returns 2 packages
-        nil returns no packages
-        3 UPS items over box max weight returns 2 packages
-      boxing charges
-        adds boxing charge from create packages
-        returns single glass boxing charge
+      filter shipping
+        returns fedex express saver, home ground, and usps standard
+        only returns ground when ormd
+        returns multiple quotes for Canada
+        returns truck option only if item has shipCode = TRK
+      truck only
+        UPS item returns truck_only as 0
+        TRK item returns truck_only as 1
+      quotes
+        returns fedex express saver, home ground, and usps standard
+        quote to FL less than quote to California
+        quote without boxing code less than quote with boxing charge
+
+    ShippingQuote::Shipping
+      runner
+        removes all fedex if po.box address
+        returns missing item weight in note and no packages
+        filters if ship_selected
+
 
 ## Development
 

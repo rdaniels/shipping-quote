@@ -5,13 +5,13 @@ config = YAML::load(IO.read("./shipping-quote-spec.yml"))
 
 cart_items = []
 class StubItem
-  def shipCode; nil;   end
-  def isGlass; nil;  end
+  #def shipCode; nil;   end
+  #def isGlass; nil;  end
   def qty;  1;  end
   def weight; 20;  end
   def backorder; 21;  end
-  def vendor; nil;  end
-  def ormd; 1; end
+  #def vendor; nil;  end
+  #def ormd; 1; end
   #def glassConverter; nil; end
 end
 class StubItem2

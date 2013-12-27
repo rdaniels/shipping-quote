@@ -1,10 +1,13 @@
 class CreatePackages
-  attr_accessor :boxing
+  attr_accessor :boxing, :notes
 
   def initialize(cart_items, config, truck_only)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
   end
 
+  def notes
+    @notes
+  end
 
   def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
     boxing_charge = 0
@@ -35,12 +38,17 @@ class CreatePackages
       item.backorder == nil ? backorder = 0 : backorder = item.backorder
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
       if item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2
-        if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
-          add_packages(item.qty, item.weight)
-        elsif shipCode != 'LEA'
-          if backorder == 2 || (backorder > 20 && backorder < 300)
-          else
-            regular_item_weight += item.weight * item.qty
+        if item.weight == nil
+          @notes = "Item #{item.ref01} is missing weight."
+          break
+        else
+          if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
+            add_packages(item.qty, item.weight)
+          elsif shipCode != 'LEA'
+            if backorder == 2 || (backorder > 20 && backorder < 300)
+            else
+              regular_item_weight += item.weight * item.qty
+            end
           end
         end
       end
@@ -58,6 +66,7 @@ class CreatePackages
     special_order
 
     @boxing = calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
+    @packages = [] if @notes != nil
     @packages
   end
 
@@ -102,7 +111,7 @@ class CreatePackages
 
     #binding.pry
     if special_order.length > 0
-      special_order.group_by { |item| item.vendor if defined? item.vendor }.each do |s|
+      special_order.group_by { |item| item.vendor }.each do |s|
         box_weight = 0
         s[1].each { |i| box_weight += i.weight }
         full_vendor_boxes += (box_weight / @config[:box_max_weight]).to_i

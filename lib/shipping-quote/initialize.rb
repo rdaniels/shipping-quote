@@ -1,6 +1,6 @@
 module ShippingQuote
   class Shipping
-    attr_accessor :boxing_charge
+    attr_accessor :boxing_charge, :notes
 
     def initialize(cart_items, config = nil)
       @cart_items = cart_items
@@ -15,12 +15,17 @@ module ShippingQuote
       #  log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
       #end
 
-      #TODO: repace !defined?  for missing methods with global handler in initialize
-      # @cart_items.extend(ItemMethods)
-      # @cart_items.each do |item|
-      #   item.merge(:shipCode => 'UPS') if !defined? item.shipCode()
-      # end
-
+      @cart_items.each do |item|
+        item.define_singleton_method(:ref01) { nil } if !defined? item.ref01
+        item.define_singleton_method(:shipCode) { nil } if !defined? item.shipCode
+        item.define_singleton_method(:isGlass) { nil } if !defined? item.isGlass
+        item.define_singleton_method(:qty) { 1 } if !defined? item.qty
+        item.define_singleton_method(:weight) { nil } if !defined? item.weight
+        item.define_singleton_method(:backorder) { nil } if !defined? item.backorder
+        item.define_singleton_method(:vendor) { nil } if !defined? item.vendor
+        item.define_singleton_method(:ormd) { nil } if !defined? item.ormd
+        item.define_singleton_method(:glassConverter) { nil } if !defined? item.glassConverter
+      end
     end
 
 
@@ -34,6 +39,7 @@ module ShippingQuote
       cp = CreatePackages.new(@cart_items, @config, truck_only)
       cp.create_packages
       @boxing_charge = cp.boxing
+      @notes = cp.notes
       cp.create_packages
     end
 

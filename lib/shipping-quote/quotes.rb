@@ -69,7 +69,6 @@ class Quote
 
   def check_ormd
     ormd_items = @cart_items
-      .find_all { |item| defined? item.ormd }
       .find_all { |item| item.ormd != nil && item.ormd > 0 }
     ormd_items.length
   end

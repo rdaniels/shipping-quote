@@ -4,12 +4,12 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'shipping-quote'
-  spec.version       = '0.0.6'
+  spec.version       = '0.0.7'
   spec.date          = '2013-12-11'
   spec.authors       = ['Rob Daniels']
   spec.email         = %w(rob@danielscorporation.com)
   spec.description   = 'Calculates shipping and boxing charges'
-  spec.summary       = 'Calculates shipping and boxing charges'
+  spec.summary       = 'Seperates cart items into boxes and passes to ActiveShipping for quote.'
   spec.homepage      = 'https://github.com/rdaniels/shipping-quote'
   spec.license       = 'MIT'
 
@@ -18,13 +18,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   # spec.require_paths = %w(lib)
 
-  spec.add_development_dependency 'bundler', '~> 1.3'
-  spec.add_development_dependency 'rake'
+  spec.add_dependency 'bundler', '~> 1.3'
+  spec.add_dependency 'rake'
+  spec.add_dependency 'active_shipping'
 
-  spec.add_development_dependency 'active_shipping'
   spec.add_development_dependency 'rspec-core', '3.0.0.beta1'
-  spec.add_development_dependency 'faker'
   spec.add_development_dependency 'pry-plus'
+  spec.add_development_dependency 'faker'
 end
 
 # build gem

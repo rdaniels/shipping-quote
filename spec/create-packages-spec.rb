@@ -8,8 +8,8 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-spec.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
-    let!(:item2) { double('item', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:destination) {
       {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
     }
@@ -36,6 +36,15 @@ module ShippingQuote
       it 'nil returns no packages' do
         ship = Shipping.new(nil, config)
         expect(ship.create_packages).to be == []
+      end
+
+      it 'returns missing item weight in note and no packages' do
+        item.stub(:weight).and_return(nil)
+        cart_items[0] = item
+        cart_items[1] = item2
+        ship = Shipping.new(cart_items, config)
+        expect(ship.create_packages).to have(0).packages
+        expect(ship.notes).to eq('Item 3000 is missing weight.')
       end
 
       it 'nil allowed in vendor and shipCode for special order item' do
