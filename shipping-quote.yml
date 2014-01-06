@@ -27,6 +27,20 @@
     :meter: '123456789'
 :usps:
   :login: 'YourUSPSLogin'
+:ups:
+    :login: 'UPS-Login'
+    :password: 'UPS-password'
+    :key: 'API-key'
+
+:us_carriers:
+  - USPS
+  - FedEx
+  - RL
+
+:canada_carriers:
+  - USPS
+  - UPS
+  - RL
 
 :shown_rates:
   - FedEx Ground
@@ -57,6 +71,7 @@
   - USPS Express Mail International
   - FedEx International Economy
   - FedEx International Priority
+  - UPS Standard
 
 
     # - USPS Standard Post

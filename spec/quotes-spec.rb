@@ -68,7 +68,6 @@ module ShippingQuote
 
     describe 'quotes' do
 
-
       it 'returns fedex express saver, home ground, and usps standard' do
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
@@ -118,6 +117,7 @@ module ShippingQuote
         express_quote_boxing = has_express[0][1]
         expect(express_quote).to be < express_quote_boxing
       end
+
     end
 
 

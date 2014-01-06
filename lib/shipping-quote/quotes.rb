@@ -1,5 +1,9 @@
+require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
+
+require_relative 'carriers'
+#include 'carriers'
 
 class Quote
   attr_accessor :notes
@@ -24,7 +28,7 @@ class Quote
   end
 
 
-  def filter_shipping(quotes, destination, ship_selected=nil )
+  def filter_shipping(quotes, destination, ship_selected=nil)
     shown_rates = []
     count_glass = pull_glass_count
 
@@ -67,55 +71,42 @@ class Quote
   end
 
   def check_ormd
-    ormd_items = @cart_items
-      .find_all { |item| item.ormd != nil && item.ormd > 0 }
+    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd > 0 }
     ormd_items.length
   end
 
   def quotes(destination, packages)
+    all_rates = []
+    c = PullCarriers.new(@config)
     origin = Location.new(@config[:origin])
     location_destination = Location.new(destination)
-    fedex_rates = pull_fedex(origin, location_destination, packages)
-    usps_rates = pull_usps(origin, location_destination, packages)
 
-    all_rates = fedex_rates + usps_rates
+    country_key = ['USPS','FedEx']
+    country_key = @config[:us_carriers] if @config[:us_carriers] != nil
+    if @config[:canada_carriers] != nil
+      (destination[:country] == 'CA') ? country_key = @config[:canada_carriers] : country_key = @config[:us_carriers]
+    end
+
+    if country_key.include? 'USPS'
+      usps_rates = c.pull_usps(origin, location_destination, packages)
+      all_rates += usps_rates
+    end
+    if country_key.include? 'UPS'
+      ups_rates = c.pull_ups(origin, location_destination, packages)
+      all_rates += ups_rates
+    end
+    if country_key.include? 'FedEx'
+      fedex_rates = c.pull_fedex(origin, location_destination, packages)
+      all_rates += fedex_rates
+    end
+
     all_rates.each { |line| line[1] = (line[1] * @config[:rate_multiplier].to_f).round(0) }
     all_rates
   end
 
-  def pull_fedex (origin, location_destination, packages)
-    fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password],
-                      key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
-    begin
-      response = fedex.find_rates(origin, location_destination, packages)
-      fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-    rescue => error
-      fedex_rates = []
-      @notes << 'FedEx ' + error.response.message
-    end
-    fedex_rates
-  end
-
-
-  def pull_usps (origin, location_destination, packages)
-    usps = USPS.new(login: @config[:usps][:login])
-    begin
-      response = usps.find_rates(origin, location_destination, packages)
-      usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-    rescue => error
-      usps_rates = []
-      @notes << 'USPS ' + error.response.message
-    end
-    usps_rates
-  end
-
-
   def notes
     @notes
   end
-
-
-
 
 
 end

@@ -109,7 +109,6 @@ class CreatePackages
     special_order = @cart_items.select { |item| item.backorder != nil }
     special_order = special_order.select { |item| (item.shipCode == 'UPS' || item.shipCode == '' || item.shipCode == nil) && (item.backorder == 2 || (item.backorder >= 20 && item.backorder < 300)) }
 
-    #binding.pry
     if special_order.length > 0
       special_order.group_by { |item| item.vendor }.each do |s|
         box_weight = 0

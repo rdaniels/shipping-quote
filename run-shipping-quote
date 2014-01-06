@@ -48,8 +48,8 @@ cart_items[0] = item
 cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
-destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
-#destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
+#destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
+destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
 config[:add_boxing_charge] = true
 ship = ShippingQuote::Shipping.new(cart_items, config)
