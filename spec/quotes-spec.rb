@@ -54,6 +54,7 @@ module ShippingQuote
         expect(has_usps).to have(0).rates
       end
       it 'returns multiple quotes for Canada' do
+        config[:canada_carriers] = nil
         destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
@@ -69,6 +70,7 @@ module ShippingQuote
     describe 'quotes' do
 
       it 'returns fedex express saver, home ground, and usps standard' do
+        config[:canada_carriers] = nil
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         packages = ship.create_packages

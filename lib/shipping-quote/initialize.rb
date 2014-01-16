@@ -1,4 +1,7 @@
 module ShippingQuote
+  #require './lib/shipping-quote/free-shipping'
+  require_relative 'free-shipping'
+
   class Shipping
     attr_accessor :boxing_charge, :notes
 

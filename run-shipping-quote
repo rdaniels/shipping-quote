@@ -48,15 +48,19 @@ cart_items[0] = item
 cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
-#destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
-destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
+destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
+#destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
-config[:add_boxing_charge] = true
+
+#ship = FreeShipping.new(cart_items, config)
+#results = ship.validate_location(destination)
+#puts results
+
+
+destination[:country] = 'United States'
 ship = ShippingQuote::Shipping.new(cart_items, config)
-packages = ship.create_packages
-#boxing = ship.boxing_charge
-quote = ship.quotes(destination,packages)
-results = ship.filter_shipping(quote, destination)
+results = ship.runner(destination)
+binding.pry
 puts results
 #has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
 

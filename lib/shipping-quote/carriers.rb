@@ -34,6 +34,7 @@ class PullCarriers
       usps_rates = []
       @notes << 'USPS ' + error.response.message
     end
+    #binding.pry
     usps_rates
   end
 
