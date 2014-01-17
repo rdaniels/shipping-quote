@@ -14,6 +14,7 @@ class PullCarriers
   def pull_fedex (origin, location_destination, packages)
     fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password],
                       key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
+
     begin
       response = fedex.find_rates(origin, location_destination, packages)
       fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
@@ -27,6 +28,7 @@ class PullCarriers
 
   def pull_usps (origin, location_destination, packages)
     usps = USPS.new(login: @config[:usps][:login])
+
     begin
       response = usps.find_rates(origin, location_destination, packages)
       usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
@@ -34,7 +36,6 @@ class PullCarriers
       usps_rates = []
       @notes << 'USPS ' + error.response.message
     end
-    #binding.pry
     usps_rates
   end
 

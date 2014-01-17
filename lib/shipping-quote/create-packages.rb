@@ -9,7 +9,7 @@ class CreatePackages
     @notes
   end
 
-  def calculate_boxing (add_lead_box, glass_boxes, dichro_boxes)
+  def calculate_boxing (add_lead_box=0, glass_boxes=0, dichro_boxes=0)
     boxing_charge = 0
 
     if glass_boxes > 6 || @truck_only == 1
@@ -18,8 +18,16 @@ class CreatePackages
     elsif @config[:add_boxing_charge] == true
       boxing_charge += @config[:lead_box_charge] if add_lead_box == 1
       boxing_charge += @config[:first_glass_box_extra_charge] if glass_boxes > 0 # $15 for first glass box, $8 each additional
-      boxing_charge += (glass_boxes * @config[:sm_glass_box_charge])
-      boxing_charge += (dichro_boxes * @config[:dichro_box_charge])
+      boxing_charge += (glass_boxes * @config[:sm_glass_box_charge].to_f)
+      boxing_charge += (dichro_boxes * @config[:dichro_box_charge].to_f)
+    end
+
+    #delphi charges $8.50 for select oversized items, from static list in config
+    @cart_items.each do |item|
+      if @config[:extra_boxing].split(' ').include? item.ref01
+        boxing_charge += @config[:extra_boxing_charge].to_f
+        break
+      end
     end
     boxing_charge
   end
@@ -83,7 +91,7 @@ class CreatePackages
       glass_pieces += item.qty * 2 if item.isGlass == 1 && (item.glassConverter == nil || item.glassConverter == 0)
       glass_pieces += item.qty * item.glassConverter if item.isGlass == 1 && (item.glassConverter != nil && item.glassConverter > 0)
     end
-    glass_boxes = (glass_pieces.to_f / 6).ceil
+    glass_boxes = (glass_pieces.to_f / @config[:lg_per_box]).ceil
     if glass_pieces > 0
       glass_box_weight = @config[:box_glass_weight]
       add_packages(glass_boxes, glass_box_weight)

@@ -1,47 +1,71 @@
+require 'net/http'
+require 'cgi'
+
 class RLQuote
   attr_accessor :notes
 
-
-  def initialize(cart_items, config, truck_only)
+  def initialize(cart_items, config, truck_only=nil)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
     @notes = []
-    @xml = Document.new
   end
 
-  # Creates the XML for the request.
-  def rate_estimate(destination)
-    root = Element.new("FREIGHTQUOTE")
-    root.attributes["accept-encoding"] = "deflate;q=0"
-    root.attributes["te"] = "deflate;q=0"
-    root.attributes["id"] = "5173944631"
-    root.attributes["origin"] = "48910" 
-    root.attributes["dest"] = destination[:country]
-    root.attributes["class1"] = ship_class
-    root.attributes["weight1"] = "#tmpweight#"
-    root.attributes["delnotify"] = "X"
-    root.attributes["hazmat"] = check_ormd
-    @xml << root
+  def http_get(domain,path,params)
+    return Net::HTTP.get(domain, "#{path}?".concat(params.collect { |k,v| "#{k}=#{CGI::escape(v.to_s)}" }.join('&'))) if not params.nil?
+    return Net::HTTP.get(domain, path)
   end
 
-  #<cfhttp url="http://www.rlcarriers.com/b2brateparam.asp" method="get" >
-  #<cfhttpparam type="header" name="accept-encoding" value="deflate;q=0">
-  #<cfhttpparam type="header" name="te" value="deflate;q=0">
-  #<cfhttpparam name="id" value="5173944631" type="url" />
-  #<cfhttpparam name="origin" value="48910"  type="url" />
-  #<cfhttpparam name="dest" value="#zip#" type="url"  />
-  #<cfhttpparam name="class1" value="#shipclass#" type="url"  />
-  #<cfhttpparam name="weight1" value="#tmpweight#" type="url"  />
-  #<cfhttpparam name="delnotify" value="X" type="url"  />
-  #<cfhttpparam name="hazmat" value="#ormd#" type="url"  />
-  #<cfhttpparam name="resdel" value="#residential#" type="url"  />
-  #</cfhttp>
+  def freight_request(destination)
+    path = '/b2brateparam.asp'
+    params = {"id" => "5173944631",
+      "origin" => "48910",
+      "dest" => destination[:postal_code],
+      "class1" => ship_class,
+      "weight1" => get_weight,
+      "delnotify" => 'X',
+      "hazmat" => check_ormd,
+      "resdel" => residential
+    }
+    res = http_get("www.rlcarriers.com", path, params)
+    my_hash = Hash.from_xml(res)
+    my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_f
+  end
 
   def ship_class
-    x = 60
+    x = 70
+    kiln = @cart_items.find_all { |item| item.name.match(/kiln/) && item.weight > 15 }
+    x = 85 if kiln.length > 0
+
+    large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass == 1 }
+    sum = large_sheet.map(&:qty).inject(0, &:+)
+    #binding.pry
+    x = 65 if sum >= 30
+
+    lead = @cart_items.find_all { |item| item.shipCode == 'LEA' }
+    x = 60 if lead.length > 0 && x == 70
     x
   end
+
   def check_ormd
+    x = ''
     ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd > 0 }
-    ormd_items.length
+    x = 'X' if ormd_items.length > 0
+    x
+  end
+
+  def residential
+    x = ''
+    #x = 'X' if pricemode = 6
+    x
+  end
+
+  def get_weight
+    #<cfif sm_boxes GT 0 or lg_boxes GT 0>
+    #                                   <cfset var lbs = (count_lg * 5) + (count_sm * 2)>
+    #<cfif lbs NEQ int(lbs)>
+    #              <cfset var lbs = int(lbs) + 1>
+    #</cfif>
+			#	<cfset tmpweight = tmpweight + lbs />
+    #</cfif>
+    20
   end
 end

@@ -6,30 +6,13 @@ module ShippingQuote
     # let(:output) { double('output').as_null_object }
     # let(:shipping) { Shipping.new }
 
-    config = YAML::load(IO.read("./shipping-quote-spec.yml"))
+    config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
     let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:destination) {
       {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
     }
-
-
-    describe 'boxing charges' do
-      it 'returns single glass boxing charge' do
-        config[:add_boxing_charge] = true
-        ship = Shipping.new(cart_items, config)
-        expect(ship.calculate_boxing(0, 1, 0)).to eq(config[:first_glass_box_extra_charge] + config[:sm_glass_box_charge])
-      end
-      it 'adds boxing charge from create packages' do
-        config[:add_boxing_charge] = true
-        item.stub(:isGlass).and_return(1)
-        cart_items[0] = item
-        ship = Shipping.new(cart_items, config)
-        ship.create_packages
-        expect(ship.boxing_charge).to eq(config[:sm_glass_box_charge] + config[:first_glass_box_extra_charge])
-      end
-    end
 
 
     describe 'create packages' do

@@ -1,6 +1,7 @@
 module ShippingQuote
   #require './lib/shipping-quote/free-shipping'
   require_relative 'free-shipping'
+  require_relative 'rlcarriers'
 
   class Shipping
     attr_accessor :boxing_charge, :notes
@@ -20,6 +21,7 @@ module ShippingQuote
 
       @cart_items.each do |item|
         item.define_singleton_method(:ref01) { nil } if !defined? item.ref01
+        item.define_singleton_method(:name) { nil } if !defined? item.name
         item.define_singleton_method(:shipCode) { nil } if !defined? item.shipCode
         item.define_singleton_method(:isGlass) { nil } if !defined? item.isGlass
         item.define_singleton_method(:qty) { 1 } if !defined? item.qty

@@ -1,26 +1,30 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.expand_path('./lib', __FILE__)
 require './lib/shipping-quote'
-config = YAML::load(IO.read("./shipping-quote-spec.yml"))
+config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
 
 cart_items = []
 class StubItem
-  #def shipCode; nil;   end
-  #def isGlass; nil;  end
-  def qty;  1;  end
+  def shipCode; nil;   end
+  def isGlass; 1;  end
+  def qty;  30;  end
   def weight; 20;  end
   def backorder; 21;  end
   #def vendor; nil;  end
-  #def ormd; 1; end
+  def ormd; nil; end
+  def name; 'studio tool'; end;
+  def ref01; 's100rr-lg'; end
   #def glassConverter; nil; end
 end
 class StubItem2
   def shipCode; nil;   end
-  def isGlass; nil;  end
-  def qty;  1;  end
+  def isGlass; 1;  end
+  def qty;  20;  end
   def weight; 2;  end
   def backorder; nil;  end
   def vendor; nil;  end
+  def name; 'widget'; end;
+  def ref01; 's100g-sht'; end
   def ormd; nil; end
   #def glassConverter; nil; end
 end
@@ -44,24 +48,41 @@ end
 item = StubItem.new
 item2 = StubItem2.new
 c = StubCustomer.new
+
 cart_items[0] = item
-cart_items[1] = item2
+#cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
-destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '48910'}
+
+
+destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
+#destination = { :country => 'US', :province => 'AP', :city => 'Tampa', :postal_code => '96319'}
 #destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
 
-#ship = FreeShipping.new(cart_items, config)
-#results = ship.validate_location(destination)
+#ship = ShippingQuote::Shipping.new(cart_items, config)
+
+#ship.create_packages
+#box = ship.boxing_charge
+#puts box
+
+ship = RLQuote.new(cart_items, config)
+ship_class = ship.ship_class
+puts ship_class
+
+#quote = ship::RLQuote.freight_request(destination)
+#puts quote
+
+#xml_in = ship.rate_estimate(destination)
+
+
+#to = config[:sm_per_box].to_f + 1
+#(0..to).each { |i| cart_items[i] = item }
+#puts cart_items
+#results = ship.create_packages
+
+#results = ship.runner(destination)
 #puts results
-
-
-destination[:country] = 'United States'
-ship = ShippingQuote::Shipping.new(cart_items, config)
-results = ship.runner(destination)
-binding.pry
-puts results
 #has_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
 
 

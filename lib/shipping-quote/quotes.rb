@@ -41,7 +41,7 @@ class Quote
       elsif ship_selected != nil
         quotes.delete_if { |a| !a.to_s.match(/#{ship_selected}/) }
       end
-
+      quotes.delete_if { |a| a.to_s.match(/USPS Media Mail/) } if all_media_mail == false
       quotes.each do |q|
         shown_rates << q if @config[:shown_rates].include? q[0]
       end
@@ -54,15 +54,6 @@ class Quote
       is_po_box = 1 if destination[:street2] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street2].to_s.downcase =~ /#{w}/ }
       shown_rates.delete_if { |rate| rate[0][0..4] == 'FedEx' } if is_po_box == 1
 
-      # mode 1 = FedEx, mode 2 = USPS, mode 3 = both
-      #mode = 2 if %w(ae ap aa dp fp).include? c.state.downcase
-      #mode = 3 if mode == nil && (c.country.downcase == 'canada' or %w(ak hi pr vi).include? c.state.downcase)
-      #mode = 1 if mode == nil && c.country.downcase == 'united states'
-      #mode = 2 if mode == nil
-
-      #skip_states = %w{ap ae ak hi pr vi}
-      #@cart_items.each { |item| no_usps = 1 if item.weight > 70 && skip_states.include?(c.state.downcase) }
-
       ormd = check_ormd
       shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd > 0
       shown_rates
@@ -73,6 +64,13 @@ class Quote
   def check_ormd
     ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd > 0 }
     ormd_items.length
+  end
+
+  def all_media_mail
+    pass = false
+    media_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'mda' }
+    pass = true if media_items.length == @cart_items.length
+    pass
   end
 
   def quotes(destination, packages)
