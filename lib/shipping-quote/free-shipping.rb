@@ -31,5 +31,6 @@ class FreeShipping
   end
 
   #TODO: eligable items with priceClass minimums
+  #TODO: pass in free shipping eligability with @cart_items items
 
 end

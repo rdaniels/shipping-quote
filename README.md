@@ -35,6 +35,7 @@ cart_items is an array of items
 example item
 
     {   ref01: '3000',
+        name: 'Super Widget'
         shipCode: 'UPS',
         isGlass: nil,
         qty: 1,
@@ -42,7 +43,8 @@ example item
         backorder: 0,
         vendor: 10,
         ormd: nil,
-        glassConverter: nil  }
+        glassConverter: nil,
+        freeShipEligable: nil }
 
 example ship_to
 

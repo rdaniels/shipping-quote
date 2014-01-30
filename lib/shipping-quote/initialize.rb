@@ -1,10 +1,13 @@
 module ShippingQuote
-  #require './lib/shipping-quote/free-shipping'
+  require_relative 'quotes'
+  require_relative 'filter-shipping'
+  require_relative 'create-packages'
   require_relative 'free-shipping'
   require_relative 'rlcarriers'
 
+
   class Shipping
-    attr_accessor :boxing_charge, :notes
+    attr_accessor :boxing_charge, :notes, :packages
 
     def initialize(cart_items, config = nil)
       @cart_items = cart_items
@@ -34,34 +37,38 @@ module ShippingQuote
     end
 
 
+    #def calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
+    #  cp = CreatePackages.new(@cart_items, @config, truck_only)
+    #  cp.calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
+    #end
 
-    def calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
-      cp = CreatePackages.new(@cart_items, @config, truck_only)
-      cp.calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
-    end
+    #def create_packages
+    #  cp = CreatePackages.new(@cart_items, @config, truck_only)
+    #  cp.package_runner
+    #  @boxing_charge = cp.boxing
+    #  @notes = cp.notes
+    #  @packages = cp.packages
+    #end
 
-    def create_packages
-      cp = CreatePackages.new(@cart_items, @config, truck_only)
-      cp.create_packages
-      @boxing_charge = cp.boxing
-      @notes = cp.notes
-      cp.create_packages
-    end
+    #def filter_shipping(quotes, destination, ship_selected=nil)
+    #  quote = Quote.new(@cart_items, @config, truck_only)
+    #  quote.filter_shipping(quotes, destination, ship_selected)
+    #end
 
-    def filter_shipping(quotes, destination, ship_selected=nil)
-      quote = Quote.new(@cart_items, @config, truck_only)
-      quote.filter_shipping(quotes, destination, ship_selected)
-    end
-
-    def quotes(destination, packages)
-      quote = Quote.new(@cart_items, @config, truck_only)
-      quote.quotes(destination, packages)
-    end
+    #def quotes(destination, packages)
+    #  quote = Quote.new(@cart_items, @config, truck_only)
+    #  quote.quotes(destination, packages)
+    #end
 
     def runner(destination, ship_selected=nil)
-      packages = create_packages
-      quotes = quotes(destination, packages)
-      filter_shipping(quotes, destination, ship_selected)
+      ship = CreatePackages.new(@cart_items,@config, truck_only)
+      packages = ship.package_runner
+      quote = Quote.new(@cart_items, @config, truck_only)
+      quotes = quote.quotes(destination, packages)
+      filter = FilterShipping.new(@cart_items,@config, truck_only)
+      filtered_quotes = filter.filter_shipping(quotes, destination )
+      quote.multiplier(filtered_quotes)
+
     end
 
     def truck_only

@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'shipping-quote'
-  spec.version       = '0.0.11'
+  spec.version       = '0.0.13'
   spec.date          = '2013-12-11'
   spec.authors       = ['Rob Daniels']
   spec.email         = %w(rob@danielscorporation.com)
@@ -24,11 +24,11 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'rspec-core', '3.0.0.beta1'
   spec.add_development_dependency 'pry-plus'
-  spec.add_development_dependency 'faker'
+  #spec.add_development_dependency 'faker'
 end
 
 # build gem
 # gem build shipping-quote.gemspec
 
 # install gem
-# sudo gem install ./shipping-quote-0.0.2.gem
+# sudo gem install ./shipping-quote-0.0.11.gem

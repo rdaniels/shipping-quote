@@ -27,7 +27,7 @@ class RLQuote
     }
     res = http_get("www.rlcarriers.com", path, params)
     my_hash = Hash.from_xml(res)
-    my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_f
+    my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
   end
 
   def ship_class
@@ -37,7 +37,6 @@ class RLQuote
 
     large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass == 1 }
     sum = large_sheet.map(&:qty).inject(0, &:+)
-    #binding.pry
     x = 65 if sum >= 30
 
     lead = @cart_items.find_all { |item| item.shipCode == 'LEA' }
@@ -52,20 +51,17 @@ class RLQuote
     x
   end
 
-  def residential
+  def residential(pricemode=1)
     x = ''
-    #x = 'X' if pricemode = 6
+    x = 'X' if pricemode == 6
     x
   end
 
-  def get_weight
-    #<cfif sm_boxes GT 0 or lg_boxes GT 0>
-    #                                   <cfset var lbs = (count_lg * 5) + (count_sm * 2)>
-    #<cfif lbs NEQ int(lbs)>
-    #              <cfset var lbs = int(lbs) + 1>
-    #</cfif>
-			#	<cfset tmpweight = tmpweight + lbs />
-    #</cfif>
-    20
+  def get_weight(sm_glass_pieces=0, lg_glass_pieces=0)
+    weight = 0
+    @cart_items.each { |item| weight += item.weight * item.qty }
+    weight += sm_glass_pieces * 2
+    weight += lg_glass_pieces * 5
+    weight
   end
 end

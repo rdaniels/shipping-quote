@@ -17,7 +17,7 @@ module ShippingQuote
       describe 'calculate glass boxes' do
         it 'has 2 small glass boxes' do
           item.stub(:isGlass).and_return(1)
-          to = config[:sm_per_box].to_f + 1
+          to = config[:sm_per_box].to_d + 1
           (0..to).each { |i| cart_items[i] = item }
           ship = Shipping.new(cart_items, config)
           expect(ship.create_packages).to have(2).packages

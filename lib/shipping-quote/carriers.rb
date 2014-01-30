@@ -19,8 +19,9 @@ class PullCarriers
       response = fedex.find_rates(origin, location_destination, packages)
       fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
     rescue => error
+      #raise error
       fedex_rates = []
-      @notes << 'FedEx ' + error.response.message
+      @notes << 'FedEx can not produce quote at this time' # + error.response.message
     end
     fedex_rates
   end

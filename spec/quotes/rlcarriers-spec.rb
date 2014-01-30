@@ -34,9 +34,23 @@ module ShippingQuote
         cart_items[0] = item
         ship = RLQuote.new(cart_items, config)
         quote = ship.freight_request(destination)
+        puts quote
         expect(quote).to be > 20
       end
 
+      it 'calculates 60 lbs shipping' do
+        item.stub(:qty).and_return(5)
+        item.stub(:weight).and_return(6)
+        item2.stub(:qty).and_return(3)
+        item2.stub(:weight).and_return(10)
+        cart_items[0] = item
+        cart_items[1] = item2
+
+        ship = RLQuote.new(cart_items, config)
+        expect(ship.get_weight).to eq(60)
+      end
+
+      it 'marks as residential if customer priceclass = 6'
     end
   end
 end
