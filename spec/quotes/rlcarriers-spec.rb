@@ -26,7 +26,6 @@ module ShippingQuote
         (21..30).each { |i| cart_items[i] = item2 }
 
         ship = RLQuote.new(cart_items, config)
-        ship_class = ship.ship_class
         expect(ship.ship_class).to eq(65)
       end
 
@@ -34,7 +33,7 @@ module ShippingQuote
         cart_items[0] = item
         ship = RLQuote.new(cart_items, config)
         quote = ship.freight_request(destination)
-        puts quote
+        #puts quote
         expect(quote).to be > 20
       end
 
@@ -50,6 +49,15 @@ module ShippingQuote
         expect(ship.get_weight).to eq(60)
       end
 
+      it 'Runner returns only Truck Shipping over $40 if shipCode = TRK' do
+        item.stub(:shipCode).and_return('TRK')
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        expect(quote[0][0]).to eq('Truck Shipping')
+        expect(quote.length).to eq(1)
+        expect(quote[0][1]).to be > 40
+      end
       it 'marks as residential if customer priceclass = 6'
     end
   end

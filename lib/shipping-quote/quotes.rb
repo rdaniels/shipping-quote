@@ -39,17 +39,22 @@ class Quote
       fedex_rates = c.pull_fedex(origin, location_destination, packages)
       all_rates += fedex_rates
     end
+    if country_key.include? 'RL' && @truck_only == 1
+      rl = RLQuote.new(@cart_items, config)
+      rl_quote = rl.freight_request(destination)
+      all_rates += ['Truck Shipping', rl_quote ]
+    end
 
     all_rates.each { |line| line[1] = (line[1] * @config[:rate_multiplier].to_d).round(0) }
     all_rates
   end
 
   def multiplier(quotes)
-    if @config[:rate_multiplier].to_d != 1
+    if @config[:rate_multiplier].to_d != 1 && quotes.length > 0
       quotes.each do |q|
         if q[0] == 'USPS Media Mail' && @config[:media_mail_multiplier].to_d != 1
           q[1] = q[1] * @config[:media_mail_multiplier].to_d
-        else
+        elsif q[0] !=  'Truck Shipping'
           q[1] = q[1] * @config[:rate_multiplier].to_d
         end
       end

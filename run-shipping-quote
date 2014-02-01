@@ -54,8 +54,8 @@ cart_items[0] = item
 #item2 = StubItem2.new
 #cart_items[2] = item2
 
-
-destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
+destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal_code => '48910'}
+#destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
 #destination = { :country => 'US', :province => 'AP', :city => 'Tampa', :postal_code => '96319'}
 #destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
@@ -64,7 +64,7 @@ config[:canada_carriers] = nil
 ship = ShippingQuote::Shipping.new(cart_items, config)
 results = ship.runner(destination)
 media_before = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-binding.pry
+#binding.pry
 puts results
 #puts ship.packages.length
 #puts ship.packages[0]

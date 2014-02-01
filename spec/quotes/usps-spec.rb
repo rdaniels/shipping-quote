@@ -67,6 +67,10 @@ module ShippingQuote
       end
     end
 
+    #TODO - international tests
+    #https://github.com/Shopify/active_shipping/blob/master/test/remote/usps_test.rb
+    #https://github.com/Shopify/active_shipping/blob/master/test/unit/carriers/usps_test.rb
+    #https://github.com/Shopify/active_shipping/tree/master/test/fixtures/xml/usps
 
   end
 end

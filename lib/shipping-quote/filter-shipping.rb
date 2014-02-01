@@ -13,7 +13,7 @@ class FilterShipping
     count_glass = pull_glass_count
 
     if count_glass > 18 || @truck_only == 1
-      shown_rates << ['Truck Shipping', 0]
+      #shown_rates << ['Truck Shipping', 0]
     else
 
       if ship_selected != nil && ship_selected == 'FedEx Ground'
