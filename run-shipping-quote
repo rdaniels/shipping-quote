@@ -5,10 +5,10 @@ config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
 
 cart_items = []
 class StubItem
-  def shipCode; 'MDA';   end
+  def shipCode; 'UPS';   end
   def isGlass; 0;  end
   def qty;  1;  end
-  def weight; 0.1;  end
+  def weight; 5;  end
   def backorder; 0;  end
   #def vendor; nil;  end
   def ormd; nil; end
@@ -60,10 +60,10 @@ destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal
 #destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
 
 #puts destination
-config[:canada_carriers] = nil
+#config[:international_carriers] = nil
 ship = ShippingQuote::Shipping.new(cart_items, config)
-results = ship.runner(destination)
-media_before = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+results = ship.runner(destination, 'FedEx Express Saver')
+#media_before = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
 #binding.pry
 puts results
 #puts ship.packages.length

@@ -27,12 +27,27 @@ class RLQuote
     }
     res = http_get("www.rlcarriers.com", path, params)
     my_hash = Hash.from_xml(res)
-    my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
+    #binding.pry
+    if my_hash ['xml']['ratequote']['netcharges'] == nil
+      @notes == 'Truck Quote not available'
+      0
+    else
+      my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
+    end
+    # begin
+    #   res = http_get("www.rlcarriers.com", path, params)
+    #   my_hash = Hash.from_xml(res)
+    #   my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
+    # rescue => error
+    #   0
+    # end
+
+
   end
 
   def ship_class
     x = 70
-    kiln = @cart_items.find_all { |item| item.name.match(/kiln/) && item.weight > 15 }
+    kiln = @cart_items.find_all { |item| item.name != nil && item.name.match(/kiln/) && item.weight > 15 }
     x = 85 if kiln.length > 0
 
     large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass == 1 }
@@ -59,7 +74,7 @@ class RLQuote
 
   def get_weight(sm_glass_pieces=0, lg_glass_pieces=0)
     weight = 0
-    @cart_items.each { |item| weight += item.weight * item.qty }
+    @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
     weight += sm_glass_pieces * 2
     weight += lg_glass_pieces * 5
     weight

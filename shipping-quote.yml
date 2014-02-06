@@ -1,31 +1,44 @@
-
-# diamondtech settings
+# delphiglass settings
+:origin:
+    :country: 'US'
+    :state: 'MI'
+    :city: 'Lansing'
+    :zip: '48910'
 
 :box_max_weight: 25,
-:box_lead_weight: 31,
-:box_glass_weight: 48,
+:box_lead_weight: 12,
+:rate_multiplier: 1.1,
 
-:add_boxing_charge: false,
-:lead_box_charge: 5,
-:sm_glass_box_charge: 8,
-:lg_glass_box_charge: 8,
-:dichro_box_charge: 5,
-:first_glass_box_extra_charge: 7,
-:sm_per_box: 6,
-:lg_per_box: 6,
+:first_class_weight_limit: 0.5,
+:media_mail_weight_limit: 0.81,
+:media_mail_multiplier: 1.3,
 
 :free_shipping:
     :start_date: nil
     :end_date: nil
 
-:rate_multiplier: 1.08,
-:origin:
-    :country: 'US'
-    :state: 'FL'
-    :city: 'Tampa'
-    :zip: '33634'
 
-:fedex: 
+#boxing charges
+:add_boxing_charge: true
+:lead_box_charge: 5,
+:sm_glass_box_charge: 6.95,
+:lg_glass_box_charge: 8.95,
+:dichro_box_charge: 2.5,
+:first_glass_box_extra_charge: 0,
+
+#glass boxes
+:sm_box_pieces: 12,
+:sm_box2_pieces: 24,
+:sm_box_weight: 18,
+:sm_box2_weight: 40,
+
+:lg_box_pieces: 4,
+:lg_box2_pieces: 9,
+:lg_box_weight: 47,
+:lg_box2_weight: 48,
+
+
+:fedex:
     :login: '123456789'
     :password: 'YourPasswordHere'
     :key: 'YourKeyHere'
@@ -38,15 +51,16 @@
     :password: 'UPS-password'
     :key: 'API-key'
 
+
 :us_carriers:
   - USPS
   - FedEx
   - RL
-
-:canada_carriers:
+:international_carriers:
   - USPS
   - UPS
   - RL
+
 
 :shown_rates:
   - FedEx Ground
@@ -54,6 +68,26 @@
   - FedEx Express Saver
   - FedEx 2 Day
   - FedEx Standard Overnight
+#  - USPS Express Mail
+#  - USPS Express Mail 1-Day
+#  - USPS Express Mail 2-Day
+#  - USPS Express Mail 3-Day
+#  - USPS Express Mail 4-Day
+#  - USPS Express Mail 5-Day
+  - USPS Priority Mail International
+  - USPS Priority Mail Express International
+#  - USPS Express Mail International
+  - FedEx International Economy
+  - FedEx International Priority
+  - UPS Standard
+  - USPS Media Mail
+  - USPS First-Class Mail Parcel
+#  - USPS Standard Post
+  - USPS Priority Mail Military
+  - USPS Priority Mail Express Military
+  - Truck Shipping
+
+:po_box_rates:
   - USPS Priority Mail
   - USPS Priority Mail 1-Day
   - USPS Priority Mail 2-Day
@@ -66,19 +100,3 @@
   - USPS Priority Mail Express 3-Day
   - USPS Priority Mail Express 4-Day
   - USPS Priority Mail Express 5-Day
-  - USPS Express Mail
-  - USPS Express Mail 1-Day
-  - USPS Express Mail 2-Day
-  - USPS Express Mail 3-Day
-  - USPS Express Mail 4-Day
-  - USPS Express Mail 5-Day
-  - USPS Priority Mail International
-  - USPS Priority Mail Express International
-  - USPS Express Mail International
-  - FedEx International Economy
-  - FedEx International Priority
-  - UPS Standard
-
-
-    # - USPS Standard Post
-    # - USPS Media Mail

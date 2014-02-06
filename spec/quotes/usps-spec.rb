@@ -23,8 +23,8 @@ module ShippingQuote
         quote = ship.runner(destination)
         has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
         has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-        expect(has_first).to have(1).rates
-        expect(has_media).to have(1).rates
+        expect(has_first.length).to eq(1)
+        expect(has_media.length).to eq(1)
       end
       it '0.6 MDA weight returns media mail but not first class' do
         item.stub(:weight).and_return(0.6)
@@ -33,8 +33,8 @@ module ShippingQuote
         quote = ship.runner(destination)
         has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
         has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-        expect(has_first).to have(0).rates
-        expect(has_media).to have(1).rates
+        expect(has_first.length).to eq(0)
+        expect(has_media.length).to eq(1)
       end
       it 'rate multiplier applied to first class' do
         item.stub(:weight).and_return(0.1)

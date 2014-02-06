@@ -1,7 +1,6 @@
 require 'pry'
 
 class FilterShipping
-
   def initialize(cart_items, config, truck_only=nil)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
     @notes = []
@@ -13,7 +12,8 @@ class FilterShipping
     count_glass = pull_glass_count
 
     if count_glass > 18 || @truck_only == 1
-      #shown_rates << ['Truck Shipping', 0]
+      quotes.delete_if { |a| !a.to_s.match(/Truck Shipping/) }
+      return quotes
     else
 
       if ship_selected != nil && ship_selected == 'FedEx Ground'
@@ -50,7 +50,7 @@ class FilterShipping
 
   def allow_first_class
     weight = 0
-    @cart_items.each { |item| weight += item.weight * item.qty }
+    @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
     return false if weight > @config[:first_class_weight_limit].to_d
     true
   end

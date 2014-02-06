@@ -24,7 +24,6 @@ module ShippingQuote
         item2.stub(:isGlass).and_return(1)
         (0..20).each { |i| cart_items[i] = item }
         (21..30).each { |i| cart_items[i] = item2 }
-
         ship = RLQuote.new(cart_items, config)
         expect(ship.ship_class).to eq(65)
       end
@@ -33,7 +32,6 @@ module ShippingQuote
         cart_items[0] = item
         ship = RLQuote.new(cart_items, config)
         quote = ship.freight_request(destination)
-        #puts quote
         expect(quote).to be > 20
       end
 
@@ -59,6 +57,7 @@ module ShippingQuote
         expect(quote[0][1]).to be > 40
       end
       it 'marks as residential if customer priceclass = 6'
+      it 'does not apply multiplier to Truck Shipping'
     end
   end
 end

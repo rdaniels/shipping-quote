@@ -37,36 +37,14 @@ module ShippingQuote
     end
 
 
-    #def calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
-    #  cp = CreatePackages.new(@cart_items, @config, truck_only)
-    #  cp.calculate_boxing(add_lead_box, glass_boxes, dichro_boxes)
-    #end
-
-    #def create_packages
-    #  cp = CreatePackages.new(@cart_items, @config, truck_only)
-    #  cp.package_runner
-    #  @boxing_charge = cp.boxing
-    #  @notes = cp.notes
-    #  @packages = cp.packages
-    #end
-
-    #def filter_shipping(quotes, destination, ship_selected=nil)
-    #  quote = Quote.new(@cart_items, @config, truck_only)
-    #  quote.filter_shipping(quotes, destination, ship_selected)
-    #end
-
-    #def quotes(destination, packages)
-    #  quote = Quote.new(@cart_items, @config, truck_only)
-    #  quote.quotes(destination, packages)
-    #end
-
     def runner(destination, ship_selected=nil)
       ship = CreatePackages.new(@cart_items,@config, truck_only)
       packages = ship.package_runner
+      @notes = ship.notes
       quote = Quote.new(@cart_items, @config, truck_only)
-      quotes = quote.quotes(destination, packages)
+      quotes = quote.quotes(destination, packages, ship_selected)
       filter = FilterShipping.new(@cart_items,@config, truck_only)
-      filtered_quotes = filter.filter_shipping(quotes, destination )
+      filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
       quote.multiplier(filtered_quotes)
 
     end

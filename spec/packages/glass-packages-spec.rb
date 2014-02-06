@@ -24,7 +24,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).package
+        expect(ship.create_packages(cart_items).length).to eq(1)
         expect(ship.boxing).to eq(config[:dichro_box_charge])
       end
 
@@ -33,7 +33,7 @@ module ShippingQuote
         item.stub(:isGlass).and_return(3)
         cart_items[0] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).package
+        expect(ship.create_packages(cart_items).length).to eq(1)
         expect(ship.boxing).to eq(config[:lg_glass_box_charge])
       end
 
@@ -44,7 +44,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(0).packages
+        expect(ship.create_packages(cart_items).length).to eq(0)
         expect(ship.notes).to eq('Item s100-lg is missing weight.')
       end
 
@@ -60,7 +60,7 @@ module ShippingQuote
         cart_items[1] = item2
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).package
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
       it 'returns 1 large and large2 glass box' do
@@ -71,7 +71,7 @@ module ShippingQuote
         cart_items[1] = item2
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(2).packages
+        expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
       it 'returns 3 large2 glass boxes + 1 reg box' do
@@ -82,7 +82,7 @@ module ShippingQuote
         cart_items[1] = item2
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(4).packages
+        expect(ship.create_packages(cart_items).length).to eq(4)
       end
     end
 
@@ -101,7 +101,7 @@ module ShippingQuote
         cart_items[1] = item2
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).packages
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
       it 'returns 1 small and small2 glass box' do
@@ -113,7 +113,7 @@ module ShippingQuote
         cart_items[1] = item2
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(2).packages
+        expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
       it 'returns 3 small2 glass boxes' do
@@ -130,7 +130,7 @@ module ShippingQuote
         cart_items[0] = item
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(3).packages
+        expect(ship.create_packages(cart_items).length).to eq(3)
       end
     end
 

@@ -17,57 +17,44 @@ module ShippingQuote
       describe 'calculate glass boxes' do
         it 'has 2 small glass boxes' do
           item.stub(:isGlass).and_return(1)
-          to = config[:sm_per_box].to_d + 1
+          item.stub(:ref01).and_return('s100rr-md')
+          to = config[:sm_box2_pieces].to_d + 1
           (0..to).each { |i| cart_items[i] = item }
-          ship = Shipping.new(cart_items, config)
-          expect(ship.create_packages).to have(2).packages
+          ship = CreatePackages.new(cart_items, config)
+          expect(ship.create_packages(cart_items).length).to eq(2)
         end
       end
     end
 
     describe 'quotes' do
-
-      xit 'returns ups and usps for canada when entry in yml' do
+      it 'returns ups and usps for canada when entry in yml' do
         destination[:country] = 'CA'
         destination[:province] = 'ON'
         destination[:postal_code] = 'L5B2T4'
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
+        #puts quote
         has_ups = quote.select{|key, value| key.to_s.match(/^UPS Standard/)}
-        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
-        expect(has_ups).to have(1).rates
-        expect(has_usps).to have_at_least(1).rates
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail International/)}
+        expect(has_ups.length).to eq(1)
+        expect(has_usps.length).to eq(1)
       end
 
-      xit 'changes "United States" to "US" ' do
+      it 'changes "United States" to "US" ' do
         destination[:country] = 'United States'
         ship = Shipping.new(cart_items, config)
         cart_items[0] = item
         results = ship.runner(destination)
         has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
-        has_usps = results.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
         has_media = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-        expect(has_express).to have(1).rates
-        expect(has_ground).to have(1).rates
-        expect(has_usps).to have_at_least(1).rates
-        expect(has_media).to have(0).rates
-        #puts results
+        expect(has_express.length).to eq(1)
+        expect(has_ground.length).to eq(1)
+        expect(has_media.length).to eq(0)
       end
 
-      xit 'returns Media Mail if all cart items are MDA' do
-        item.stub(:shipCode).and_return('MDA')
-        cart_items[0] = item
-        ship = Shipping.new(cart_items, config)
-        results = ship.runner(destination)
-        has_express = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-        expect(has_express).to have(1).rates
-      end
     end
-
-
-
   end
 end
 

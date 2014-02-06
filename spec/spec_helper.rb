@@ -13,4 +13,10 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.order = 'random'
+  #config.raise_errors_for_deprecations!
+
+  #hide deprication warnings
+  config.mock_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
 end

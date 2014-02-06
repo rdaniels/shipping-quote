@@ -21,7 +21,7 @@ module ShippingQuote
         cart_items[1] = item2
         ship = CreatePackages.new(cart_items, config)
         ship.lead_packages(cart_items)
-        expect(ship.packages).to have(1).package
+        expect(ship.packages.length).to eq(1) #have_1(:package)
         expect(ship.packages[0].weight / 16).to eq(config[:box_lead_weight])
       end
 
@@ -31,7 +31,7 @@ module ShippingQuote
         cart_items[0] = item
         ship = CreatePackages.new(cart_items, config)
         ship.lead_packages(cart_items)
-        expect(ship.packages).to have(1).package
+        expect(ship.packages.length).to eq(1) # have(1).package
         expect(ship.packages[0].weight / 16).to eq(20)
       end
     end
@@ -43,8 +43,8 @@ module ShippingQuote
         cart_items[1] = item2
         ship = CreatePackages.new(cart_items, config)
         ship.package_runner
-        expect(ship.special_order_items).to have(1).item
-        expect(ship.stock_items).to have(1).item
+        expect(ship.special_order_items.length).to eq(1)
+        expect(ship.stock_items.length).to eq(1)
       end
 
       it 'returns 2 stock items and 0 special order item' do
@@ -52,8 +52,8 @@ module ShippingQuote
         cart_items[1] = item2
         ship = CreatePackages.new(cart_items, config)
         ship.package_runner
-        expect(ship.special_order_items).to have(0).item
-        expect(ship.stock_items).to have(2).item
+        expect(ship.special_order_items.length).to eq(0)
+        expect(ship.stock_items.length).to eq(2)
       end
 
       it '1 special order item + 1 UPS item under box max weight returns 2 packages' do
@@ -61,9 +61,9 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.package_runner).to have(2).packages
-        expect(ship.special_order_items).to have(1).item
-        expect(ship.stock_items).to have(1).item
+        expect(ship.package_runner.length).to eq(2) #have(2).packages
+        expect(ship.special_order_items.length).to eq(1) #have(1).item
+        expect(ship.stock_items.length).to eq(1) #have(1).item
       end
 
       it '2 special order items + 1 UPS item under box max weight returns 2 packages' do
@@ -72,9 +72,9 @@ module ShippingQuote
         cart_items[1] = item
         cart_items[2] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.package_runner).to have(2).packages
-        expect(ship.special_order_items).to have(2).item
-        expect(ship.stock_items).to have(1).item
+        expect(ship.package_runner.length).to eq(2)
+        expect(ship.special_order_items.length).to eq(2)
+        expect(ship.stock_items.length).to eq(1)
       end
     end
 
@@ -93,14 +93,14 @@ module ShippingQuote
         item.stub(:shipCode).and_return('SHA')
         cart_items[0] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).packages
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
       it 'returns missing item weight in note and no packages' do
         item.stub(:weight).and_return(nil)
         cart_items[0] = item
         cart_items[1] = item2
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(0).packages
+        expect(ship.create_packages(cart_items).length).to eq(0)
         expect(ship.notes).to eq('Item 3000 is missing weight.')
       end
 
@@ -108,7 +108,7 @@ module ShippingQuote
       it 'single UPS item under box max weight returns 1 package' do
         cart_items[0] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).packages
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
       it '4 UPS items under box max weight returns 1 package' do
@@ -117,7 +117,7 @@ module ShippingQuote
         cart_items[2] = item
         cart_items[3] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).packages
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
       it '2 UPS items over box max weight returns 2 packages' do
@@ -125,7 +125,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(2).packages
+        expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
       it '3 UPS items over box max weight returns 2 packages' do
@@ -134,7 +134,7 @@ module ShippingQuote
         cart_items[2] = item
 
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(2).packages
+        expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
 
@@ -143,12 +143,12 @@ module ShippingQuote
         item.stub(:shipCode).and_return('LEA')
         (0..Random.rand(3...20)).each { |i| cart_items[i] = item }
         ship = CreatePackages.new(cart_items, config)
-        expect(ship.create_packages(cart_items)).to have(1).packages
+        expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
       it 'nil returns no packages' do
         ship = CreatePackages.new(nil, config)
-        expect(ship.create_packages(cart_items)).to have(0).packages
+        expect(ship.create_packages(cart_items).length).to eq(0)
       end
     end
   end
