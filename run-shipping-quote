@@ -64,11 +64,10 @@ destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal
 ship = ShippingQuote::Shipping.new(cart_items, config)
 results = ship.runner(destination, 'FedEx Express Saver')
 #media_before = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-#binding.pry
 puts results
 #puts ship.packages.length
 #puts ship.packages[0]
-#binding.pry
+
 
 #puts ship.lead_packages(cart_items)
 #puts ship.packages

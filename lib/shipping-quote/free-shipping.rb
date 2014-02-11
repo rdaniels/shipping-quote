@@ -1,4 +1,4 @@
-require 'pry'
+# require 'pry'
 class FreeShipping
 
   def initialize(cart_items, config, truck_only=nil)
