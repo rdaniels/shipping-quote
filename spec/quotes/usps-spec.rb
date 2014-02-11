@@ -1,5 +1,5 @@
 require 'spec_helper'
-## require 'pry'
+#require 'pry'
 
 module ShippingQuote
   describe Shipping do
@@ -10,6 +10,21 @@ module ShippingQuote
     let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
     cart_items = []
+
+    describe 'removes 1-Day, 2-Day, etc. messaging' do
+        it 'returns USPS Priority Mail' do
+            config[:shown_rates] += ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day',
+                'USPS Priority Mail 4-Day','USPS Priority Mail 5-Day']
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            quote = ship.runner(destination)
+            has_day = quote.select{|key, value| key.to_s.match(/-Day/)}
+            has_usps = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
+            expect(has_day.length).to eq(0)
+            expect(has_usps.length).to be > 0
+        end
+
+    end
 
     describe 'usps shipping' do
       config[:rate_multiplier] = 1.1
