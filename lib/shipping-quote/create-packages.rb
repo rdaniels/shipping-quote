@@ -177,7 +177,6 @@ class CreatePackages
     end
     lead_weight = @config[:box_lead_weight] if lead_weight < @config[:box_lead_weight] && lead_weight > 0
     add_packages(1, lead_weight) if lead_weight > 0
-    #binding.pry
 
     (lead_weight > 0) ? 1 : 0
   end

@@ -5,6 +5,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = "shipping"
   #config.vm.box = "lucid64_shipping"
   config.vm.box = "precise64_rspec"
-  config.vm.network :forwarded_port, guest: 80, host: 4567
-  config.vm.network :forwarded_port, guest: 3000, host: 3000
+  #config.vm.network :forwarded_port, guest: 80, host: 4567
+  #config.vm.network :forwarded_port, guest: 3000, host: 3000
 end

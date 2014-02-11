@@ -41,6 +41,7 @@ module ShippingQuote
       ship = CreatePackages.new(@cart_items,@config, truck_only)
       packages = ship.package_runner
       @notes = ship.notes
+      @boxing_charge = ship.boxing
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)
       filter = FilterShipping.new(@cart_items,@config, truck_only)

@@ -1,31 +1,32 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.expand_path('./lib', __FILE__)
 require './lib/shipping-quote'
+require 'pry'
 config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
 
 cart_items = []
 class StubItem
-  def shipCode; 'UPS';   end
-  def isGlass; 0;  end
+ #def shipCode; 'UPS';   end
+  def isGlass; 1;  end
   def qty;  1;  end
   def weight; 5;  end
-  def backorder; 0;  end
+  def backorder; 28;  end
   #def vendor; nil;  end
   def ormd; nil; end
-  def name; 'studio tool'; end;
-  def ref01; 's100rr'; end
-  #def glassConverter; nil; end
+  def name; 'Kokomo Medium Amber, Lime Green, Opal'; end;
+  def ref01; 'K13'; end
+  def glassConverter; 4; end
 end
 class StubItem2
-  def shipCode; 'LEA';   end
+  #def shipCode; 'LEA';   end
   def isGlass; 0;  end
-  def qty;  2;  end
+  def qty;  1;  end
   def weight; 2;  end
-  def backorder; nil;  end
-  def vendor; nil;  end
-  def name; 'widget'; end;
-  def ref01; 's100g'; end
-  def ormd; nil; end
+  def backorder; 0;  end
+  #def vendor; nil;  end
+  def name; 'Creator&#39;s Premium Bottle Cutter'; end;
+  def ref01; '401187'; end
+  #def ormd; nil; end
   #def glassConverter; nil; end
 end
 class StubCustomer
@@ -36,6 +37,9 @@ class StubCustomer
   def state; 'FL' end
   def zip; '33609'; end
 end
+
+
+
 
 #TODO: handle missing shipcode@config[:add_boxing_charge]
 #  @cart_items => [#<CartItem id: 143, cartID: 10783, custID: 34, creationDate: "2013-12-21 11:15:00", item: 214392, ref01: "801005",
@@ -50,7 +54,7 @@ item2 = StubItem2.new
 c = StubCustomer.new
 
 cart_items[0] = item
-#cart_items[1] = item2
+cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
 
@@ -63,7 +67,7 @@ destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal
 #config[:international_carriers] = nil
 ship = ShippingQuote::Shipping.new(cart_items, config)
 results = ship.runner(destination, 'FedEx Express Saver')
-#media_before = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+binding.pry
 puts results
 #puts ship.packages.length
 #puts ship.packages[0]
