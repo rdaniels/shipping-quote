@@ -18,7 +18,7 @@ class PullCarriers
     begin
       response = fedex.find_rates(origin, location_destination, packages)
       fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-    rescue => error
+    rescue #=> error
       #raise error
       fedex_rates = []
       @notes << 'FedEx can not produce quote at this time' # + error.response.message
@@ -33,9 +33,9 @@ class PullCarriers
     begin
       response = usps.find_rates(origin, location_destination, packages)
       usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-    rescue => error
+    rescue #=> error
       usps_rates = []
-      @notes << 'USPS ' + error.response.message
+      @notes << 'USPS can not produce quotes at this time' # + error.response.message
     end
     usps_rates
   end
@@ -46,9 +46,9 @@ class PullCarriers
     begin
       response = ups.find_rates(origin, location_destination, packages)
       ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-    rescue => error
+    rescue #=> error
       ups_rates = []
-      @notes << 'UPS ' + error.response.message
+      @notes << 'UPS can not produce quotes at this time' # + error.response.message
     end
     ups_rates
   end
