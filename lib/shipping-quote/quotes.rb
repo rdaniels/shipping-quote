@@ -51,6 +51,10 @@ class Quote
     end
 
 
+    if country_key.include? 'FedEx'
+      fedex_rates = c.pull_fedex(origin, location_destination, packages)
+      all_rates += fedex_rates
+    end
     if country_key.include? 'USPS'
       usps_rates = c.pull_usps(origin, location_destination, packages)
       all_rates += usps_rates
@@ -58,10 +62,6 @@ class Quote
     if country_key.include? 'UPS'
       ups_rates = c.pull_ups(origin, location_destination, packages)
       all_rates += ups_rates
-    end
-    if country_key.include? 'FedEx'
-      fedex_rates = c.pull_fedex(origin, location_destination, packages)
-      all_rates += fedex_rates
     end
 
     if country_key.include? 'RL'

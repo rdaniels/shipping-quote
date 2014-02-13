@@ -12,7 +12,7 @@ module ShippingQuote
 
 
     describe 'international runner' do
-      xit 'returns USPS quote for VE with 5 digit zip' do
+      it 'returns USPS quote for VE with 5 digit zip' do
         destination[:country] = 'VE'
         destination[:postal_code] = '05030'
         destination[:province] = 'RUBIO'
@@ -24,7 +24,7 @@ module ShippingQuote
         expect(has_usps.length).to be > 0
       end
 
-      xit 'returns USPS quote for AR' do
+      it 'returns USPS quote for AR' do
         destination[:country] = 'AR'
         destination[:postal_code] = '1426'
         destination[:province] = 'Capital Federal'
@@ -36,7 +36,7 @@ module ShippingQuote
         expect(has_usps.length).to be > 0
       end
 
-      xit 'returns USPS quote for ZA' do
+      it 'returns USPS quote for ZA' do
         destination[:country] = 'ZA'
         destination[:postal_code] = '5247'
         destination[:province] = 'East London'
@@ -48,7 +48,7 @@ module ShippingQuote
         expect(has_usps.length).to be > 0
       end
 
-      xit 'returns USPS quote for VE with 4 digit zip' do
+      it 'returns USPS quote for VE with 4 digit zip' do
         destination[:country] = 'VE'
         destination[:postal_code] = '6023'
         destination[:province] = 'El TIgre'
@@ -69,6 +69,7 @@ module ShippingQuote
         config[:origin][:state] = 'AZ'
         config[:origin][:country] = 'US'
         config[:origin][:zip] = '85281'
+        config[:international_carriers] = %w{USPS UPS RL}
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         results = ship.runner(destination)
