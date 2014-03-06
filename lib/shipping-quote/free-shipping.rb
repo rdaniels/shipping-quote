@@ -4,9 +4,9 @@ class FreeShipping
     @cart_items, @config, @truck_only = cart_items, config, truck_only
   end
 
-  def update_quote(quotes, new_price)
+  def update_quote(quotes, new_price, shipping_method='FedEx Ground')
     shown_rates = []
-    quotes.each {|q| q[0] == 'FedEx Ground' ? shown_rates << [q[0], new_price] : shown_rates << q}
+    quotes.each {|q| q[0] == shipping_method ? shown_rates << [q[0], new_price] : shown_rates << q}
     shown_rates
   end
 
@@ -16,6 +16,15 @@ class FreeShipping
     return false if validate_location(destination) == false
     return false if validate_date == false && free_ship == 1
     return true if free_ship == 2 || free_ship == 3
+  end
+
+
+  def self.lowest_priced(quotes)
+    lowest_shipping = quotes[0]
+    quotes.each do |q|
+      lowest_shipping = q if q[1] < lowest_shipping[1]
+    end
+    lowest_shipping
   end
 
 

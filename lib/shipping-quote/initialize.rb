@@ -40,7 +40,7 @@ module ShippingQuote
     end
 
 
-    def runner(destination, ship_selected=nil)
+    def runner(destination, ship_selected=nil, allow_free_ship=true)
       ship = CreatePackages.new(@cart_items, @config, destination, truck_only)
       packages = ship.package_runner
       @notes = ship.notes
@@ -51,17 +51,20 @@ module ShippingQuote
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 
       # free shipping
-      free_shipping = FreeShipping.new(@cart_items,@config)
-      if truck_only == 0 && free_shipping.validate_location(destination) == true
-        ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
-        packages_free_removed = ship_free.package_runner(1)
+      if allow_free_ship == true
+        free_shipping = FreeShipping.new(@cart_items,@config)
+        if truck_only == 0 && free_shipping.validate_location(destination) == true && filtered_quotes != []
+          lowest_priced = FreeShipping.lowest_priced(filtered_quotes)[0]
+          ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
+          packages_free_removed = ship_free.package_runner(1)
+          if packages_free_removed.map{|p| p.weight}.sum != packages.map{|p| p.weight}.sum
+            if packages_free_removed == nil || packages_free_removed.length == 0
+              filtered_quotes = free_shipping.update_quote(filtered_quotes, 0, lowest_priced)
+            else
 
-        if packages_free_removed.map{|p| p.weight}.sum != packages.map{|p| p.weight}.sum
-          if packages_free_removed == nil || packages_free_removed.length == 0
-            filtered_quotes = free_shipping.update_quote(filtered_quotes, 0)
-          else
-            quotes_free_removed = quote.quotes(destination, packages_free_removed, 'FedEx Ground')
-            filtered_quotes = free_shipping.update_quote(filtered_quotes, quotes_free_removed[0][1])
+              quotes_free_removed = quote.quotes(destination, packages_free_removed, lowest_priced)
+              filtered_quotes = free_shipping.update_quote(filtered_quotes, quotes_free_removed[0][1], lowest_priced)
+            end
           end
         end
       end

@@ -9,7 +9,7 @@ module ShippingQuote
     config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
     let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: 2) }
-    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
+    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 5, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
     #let!(:destination) { { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}  }
 
@@ -18,6 +18,7 @@ module ShippingQuote
       config[:free_shipping] = {}
 
       it 'returns free FedEx ground for 1 item with U_FreeShip = 2' do
+        item.stub(:freeShipping).and_return(2)
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
@@ -25,9 +26,53 @@ module ShippingQuote
         expect(has_fedex[0][1]).to eq(0)
         expect(quote.length).to be > 1
       end
+
+      it 'returns free First-Class Parcel when item qualifies' do
+        item.stub(:freeShipping).and_return(2)
+        item.stub(:weight).and_return(0.1)
+        item.stub(:shipCode).and_return('UPS')
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
+        expect(has_usps[0][1]).to eq(0)
+        expect(quote.length).to be > 1
+      end
+
+      it 'returns free Media Mail when item qualifies' do
+        item.stub(:freeShipping).and_return(2)
+        item.stub(:weight).and_return(0.6)
+        item.stub(:shipCode).and_return('MDA')
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        expect(has_usps[0][1]).to eq(0)
+        expect(quote.length).to be > 1
+      end
     end
 
 
+    describe 'comparison test' do
+      it 'quote with free ship items less than quote without' do
+        cart_items[0] = item
+        cart_items[1] = item2
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_fedex = quote.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        fedex_quote = has_fedex[0][1]
+
+        item.stub(:freeShipping).and_return(0)
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_fedex = quote.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        fedex_quote_ca = has_fedex[0][1]
+        expect(fedex_quote).to be > fedex_quote_ca
+        expect(fedex_quote).to be > 0
+        expect(fedex_quote_ca).to be > 0
+      end
+    end
 
 
     describe 'validate_date' do
@@ -75,6 +120,19 @@ module ShippingQuote
         destination[:state] = 'HI'
         ship = FreeShipping.new(cart_items, config)
         expect(ship.validate_location(destination)).to eq(false)
+      end
+
+      it 'does not return free FedEx ground for 1 when country = AR' do
+        destination[:country] = 'AR'
+        destination[:postal_code] = '1426'
+        destination[:province] = 'Capital Federal'
+        destination[:city] = ''
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail International/)}
+        expect(has_usps[0][1]).to be > 0
+        expect(quote.length).to be > 1
       end
     end
   end
