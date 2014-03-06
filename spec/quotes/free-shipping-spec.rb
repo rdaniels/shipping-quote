@@ -1,5 +1,5 @@
 require 'spec_helper'
-## require 'pry'
+require 'pry'
 
 module ShippingQuote
   describe Shipping do
@@ -8,10 +8,27 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipEligable: 1) }
-    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipEligable: nil) }
+    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: 2) }
+    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
     #let!(:destination) { { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}  }
+
+    describe 'always free ship items' do
+      let(:cart_items[0]) { item }
+      config[:free_shipping] = {}
+
+      it 'returns free FedEx ground for 1 item with U_FreeShip = 2' do
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        has_fedex = quote.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        expect(has_fedex[0][1]).to eq(0)
+        expect(quote.length).to be > 1
+      end
+    end
+
+
+
 
     describe 'validate_date' do
       let(:cart_items[0]) { item }

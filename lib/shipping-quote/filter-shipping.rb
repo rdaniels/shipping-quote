@@ -47,6 +47,7 @@ class FilterShipping
   def allow_media_mail
     pass = false
     media_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'mda' }
+    npa_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'npa' }
     pass = true if media_items.length == @cart_items.length
     pass
   end
@@ -54,7 +55,11 @@ class FilterShipping
   def allow_first_class
     weight = 0
     @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
-    return false if weight > @config[:first_class_weight_limit].to_d
+    npa_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'npa' }
+
+#binding.pry
+
+    return false if weight > @config[:first_class_weight_limit].to_d || npa_items.length > 0
     true
   end
 

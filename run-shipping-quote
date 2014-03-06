@@ -66,7 +66,7 @@ destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal
 #puts destination
 #config[:international_carriers] = nil
 ship = ShippingQuote::Shipping.new(cart_items, config)
-results = ship.runner(destination, 'FedEx Express Saver')
+results = ship.runner(destination)
 binding.pry
 puts results
 #puts ship.packages.length

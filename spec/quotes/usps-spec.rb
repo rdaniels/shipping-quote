@@ -6,15 +6,14 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', ref01: '3000', shipCode: 'MDA', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
-    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', ref01: '3000', shipCode: 'MDA', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
+    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
     cart_items = []
+    config[:shown_rates] += ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day','USPS Priority Mail 4-Day','USPS Priority Mail 5-Day','USPS First-Class Mail Parcel']
 
     describe 'removes 1-Day, 2-Day, etc. messaging' do
         it 'returns USPS Priority Mail' do
-            config[:shown_rates] += ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day',
-                'USPS Priority Mail 4-Day','USPS Priority Mail 5-Day']
             cart_items[0] = item
             ship = Shipping.new(cart_items, config)
             quote = ship.runner(destination)
@@ -30,17 +29,50 @@ module ShippingQuote
       config[:rate_multiplier] = 1.1
       config[:media_mail_multiplier] = 1.3
       config[:first_class_weight_limit] = 0.5
+      # config[:shown_rates] += ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day','USPS Priority Mail 4-Day','USPS Priority Mail 5-Day','USPS First-Class Mail Parcel','USPS Media Mail']
+
+
+        it 'NPA items can not ship usps first class parcel' do
+            item.stub(:weight).and_return(0.1)
+            item.stub(:shipCode).and_return('NPA')
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            quote = ship.runner(destination)
+            has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            expect(has_first.length).to eq(0)
+            expect(has_media.length).to eq(0)
+            expect(quote.length).to be > 0
+        end
+
+        it 'ORMD can not ship usps first class parcel or media mail' do
+            item.stub(:weight).and_return(0.1)
+            item.stub(:ormd).and_return(1)
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            quote = ship.runner(destination)
+            has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            expect(has_first.length).to eq(0)
+            expect(has_media.length).to eq(0)
+            expect(quote.length).to be > 0
+        end
+
+
 
       it '0.1 MDA weight returns first class parcel & media mail' do
+        # config[:shown_rates] = ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day','USPS Priority Mail 4-Day','USPS Priority Mail 5-Day','USPS First-Class Mail Parcel','USPS Media Mail']
         item.stub(:weight).and_return(0.1)
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
         has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
         has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+
         expect(has_first.length).to eq(1)
         expect(has_media.length).to eq(1)
       end
+
       it '0.6 MDA weight returns media mail but not first class' do
         item.stub(:weight).and_return(0.6)
         cart_items[0] = item
@@ -51,10 +83,11 @@ module ShippingQuote
         expect(has_first.length).to eq(0)
         expect(has_media.length).to eq(1)
       end
+
       it 'rate multiplier applied to first class' do
         item.stub(:weight).and_return(0.1)
         cart_items[0] = item
-        ship = CreatePackages.new(cart_items,config)
+        ship = CreatePackages.new(cart_items, config, destination)
         packages = ship.package_runner
         quote = Quote.new(cart_items, config)
         quotes = quote.quotes(destination, packages)
@@ -69,7 +102,7 @@ module ShippingQuote
       it 'media mail multiplier applied to media mail class' do
         item.stub(:weight).and_return(0.1)
         cart_items[0] = item
-        ship = CreatePackages.new(cart_items,config)
+        ship = CreatePackages.new(cart_items, config, destination)
         packages = ship.package_runner
         quote = Quote.new(cart_items, config)
         quotes = quote.quotes(destination, packages)

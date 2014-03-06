@@ -1,9 +1,23 @@
-# require 'pry'
 class FreeShipping
 
   def initialize(cart_items, config, truck_only=nil)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
   end
+
+  def update_quote(quotes, new_price)
+    shown_rates = []
+    quotes.each {|q| q[0] == 'FedEx Ground' ? shown_rates << [q[0], new_price] : shown_rates << q}
+    shown_rates
+  end
+
+
+  def free_ship_ok(free_ship, destination)
+    return false if free_ship == nil || free_ship == 0
+    return false if validate_location(destination) == false
+    return false if validate_date == false && free_ship == 1
+    return true if free_ship == 2 || free_ship == 3
+  end
+
 
   def validate_date
     pass = true
@@ -22,6 +36,7 @@ class FreeShipping
     end
     pass
   end
+
 
   def validate_location(destination)
     pass = true

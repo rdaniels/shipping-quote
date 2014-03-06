@@ -1,20 +1,22 @@
+require_relative 'filter-shipping'
+
 class CreatePackages
   attr_accessor :boxing, :notes, :packages, :stock_items, :special_order_items
 
-  def initialize(cart_items, config, truck_only=0)
-    @cart_items, @config, @truck_only = cart_items, config, truck_only
+  def initialize(cart_items, config, destination, truck_only=0)
+    @cart_items, @config, @destination, @truck_only = cart_items, config, destination, truck_only
     @cart_items = [] if @cart_items == nil
     @packages = []
     @boxing = 0
   end
 
 
-  def package_runner
+  def package_runner(free_shipping_run=0)
     @special_order_items = @cart_items.select do |item|
       item.backorder != nil && (item.backorder == 2 || (item.backorder > 20 && item.backorder < 300))
     end
     @stock_items = @cart_items.select { |item| !special_order_items.include? item }
-    create_packages(@stock_items) if @stock_items.length > 0
+    create_packages(@stock_items, free_shipping_run) if @stock_items.length > 0
     create_packages(@special_order_items) if @special_order_items.length > 0
     @packages
   end
@@ -53,14 +55,17 @@ class CreatePackages
 
 
 
-  def create_packages(cart_items)
+  def create_packages(cart_items, free_shipping_run=0)
     regular_item_weight = 0
+    free_shipping = FreeShipping.new(@cart_items,@config)
 
     cart_items.each do |item|
-      #item.backorder == nil ? backorder = 0 : backorder = item.backorder
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
 
-      if item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2 || item.isGlass == 3
+#binding.pry
+
+      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && (item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2 || item.isGlass == 3)
+
         if item.ref01[-4,4] != '-sht'  # dichro sheet added as large glass piece
           if item.weight == nil
             @notes = "Item #{item.ref01} is missing weight."

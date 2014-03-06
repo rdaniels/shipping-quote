@@ -20,7 +20,7 @@ module ShippingQuote
           item.stub(:ref01).and_return('s100rr-md')
           to = config[:sm_box2_pieces].to_d + 1
           (0..to).each { |i| cart_items[i] = item }
-          ship = CreatePackages.new(cart_items, config)
+          ship = CreatePackages.new(cart_items, config, destination)
           expect(ship.create_packages(cart_items).length).to eq(2)
         end
       end

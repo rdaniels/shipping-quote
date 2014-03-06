@@ -1,3 +1,5 @@
+require 'pry'
+
 module ShippingQuote
   require_relative 'quotes'
   require_relative 'filter-shipping'
@@ -33,12 +35,13 @@ module ShippingQuote
         item.define_singleton_method(:vendor) { nil } if !defined? item.vendor
         item.define_singleton_method(:ormd) { nil } if !defined? item.ormd
         item.define_singleton_method(:glassConverter) { nil } if !defined? item.glassConverter
+        item.define_singleton_method(:freeShipping) { nil } if !defined? item.freeShipping
       end
     end
 
 
     def runner(destination, ship_selected=nil)
-      ship = CreatePackages.new(@cart_items,@config, truck_only)
+      ship = CreatePackages.new(@cart_items, @config, destination, truck_only)
       packages = ship.package_runner
       @notes = ship.notes
       @boxing_charge = ship.boxing
@@ -46,9 +49,25 @@ module ShippingQuote
       quotes = quote.quotes(destination, packages, ship_selected)
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
-      quote.multiplier(filtered_quotes)
 
+      # free shipping
+      free_shipping = FreeShipping.new(@cart_items,@config)
+      if truck_only == 0 && free_shipping.validate_location(destination) == true
+        ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
+        packages_free_removed = ship_free.package_runner(1)
+
+        if packages_free_removed.map{|p| p.weight}.sum != packages.map{|p| p.weight}.sum
+          if packages_free_removed == nil || packages_free_removed.length == 0
+            filtered_quotes = free_shipping.update_quote(filtered_quotes, 0)
+          else
+            quotes_free_removed = quote.quotes(destination, packages_free_removed, 'FedEx Ground')
+            filtered_quotes = free_shipping.update_quote(filtered_quotes, quotes_free_removed[0][1])
+          end
+        end
+      end
+      quote.multiplier(filtered_quotes)
     end
+
 
     def truck_only
       @cart_items.each do |item|

@@ -6,8 +6,8 @@ module ShippingQuote
 
   describe CreatePackages do
     let!(:cart_items) { [] }
-    let!(:item) { double('item', ref01: 's100-lg', shipCode: 'UPS', isGlass: 1, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
-    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: 1, qty: 1, weight: 10, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', ref01: 's100-lg', shipCode: 'UPS', isGlass: 1, qty: 1, weight: 2, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
+    let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: 1, qty: 1, weight: 10, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
     let!(:destination) { {:country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
 
     config[:lg_box_pieces] = 4
@@ -23,7 +23,7 @@ module ShippingQuote
         item2.stub(:isGlass).and_return(0)
         cart_items[0] = item
         cart_items[1] = item
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(1)
         expect(ship.boxing).to eq(config[:dichro_box_charge])
       end
@@ -32,7 +32,7 @@ module ShippingQuote
         item.stub(:ref01).and_return('x100-sht')
         item.stub(:isGlass).and_return(3)
         cart_items[0] = item
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(1)
         expect(ship.boxing).to eq(config[:lg_glass_box_charge])
       end
@@ -43,7 +43,7 @@ module ShippingQuote
         item2.stub(:isGlass).and_return(0)
         cart_items[0] = item
         cart_items[1] = item
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(0)
         expect(ship.notes).to eq('Item s100-lg is missing weight.')
       end
@@ -59,7 +59,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
@@ -70,7 +70,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
@@ -81,7 +81,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(4)
       end
     end
@@ -90,7 +90,7 @@ module ShippingQuote
     describe 'small glass packages' do
       it 'returns no small or small2 glass box' do
         cart_items[0] = item
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.small_glass_packages(0)).to eq([0,0])
       end
 
@@ -100,7 +100,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(1)
       end
 
@@ -112,7 +112,7 @@ module ShippingQuote
         cart_items[0] = item
         cart_items[1] = item2
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(2)
       end
 
@@ -121,7 +121,7 @@ module ShippingQuote
         item.stub(:qty).and_return(72)
         cart_items[0] = item
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.small_glass_packages(72)).to eq([0,3])
       end
       it 'returns 3 small2 glass packages' do
@@ -129,7 +129,7 @@ module ShippingQuote
         item.stub(:qty).and_return(72)
         cart_items[0] = item
 
-        ship = CreatePackages.new(cart_items, config)
+        ship = CreatePackages.new(cart_items, config, destination)
         expect(ship.create_packages(cart_items).length).to eq(3)
       end
     end
