@@ -23,52 +23,17 @@ class CreatePackages
 
 
 
-
-  def calculate_boxing (add_lead_box=0, small_glass_boxes=0, large_glass_boxes=0, dichro_boxes=0)
-    boxing_charge = 0
-    large_glass_boxes = 0 if large_glass_boxes == nil
-    small_glass_boxes = 0 if small_glass_boxes == nil
-
-    if large_glass_boxes > 6 || @truck_only == 1
-      boxing_charge = 0
-
-    elsif @config[:add_boxing_charge] == true
-      boxing_charge += @config[:lead_box_charge] if add_lead_box > 0
-      boxing_charge += @config[:first_glass_box_extra_charge] if small_glass_boxes > 0 || large_glass_boxes > 0 # $15 for first glass box, $8 each additional
-      boxing_charge += (large_glass_boxes * @config[:lg_glass_box_charge].to_d)
-      boxing_charge += (small_glass_boxes * @config[:sm_glass_box_charge].to_d)
-      boxing_charge += @config[:dichro_box_charge].to_d if dichro_boxes > 0
-    end
-
-    #delphi charges $8.50 for select oversized items, from static list in config
-    #@cart_items.each do |item|
-    #  if @config[:extra_boxing].split(' ').include? item.ref01
-    #    boxing_charge += @config[:extra_boxing_charge].to_d
-    #    break
-    #  end
-    #end
-
-    boxing_charge
-  end
-
-
-
-
-
   def create_packages(cart_items, free_shipping_run=0)
     regular_item_weight = 0
-    free_shipping = FreeShipping.new(@cart_items,@config)
-
+    free_shipping = FreeShipping.new(cart_items,@config)
     cart_items.each do |item|
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
 
-#binding.pry
+      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && (item.isGlass == nil || item.isGlass.to_i == 0 || item.isGlass == 2 || item.isGlass == 3)
 
-      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && (item.isGlass == nil || item.isGlass == 0 || item.isGlass == 2 || item.isGlass == 3)
-
-        if item.ref01[-4,4] != '-sht'  # dichro sheet added as large glass piece
+        if item.ref01.to_s[-4,4] != '-sht'  # dichro sheet added as large glass piece
           if item.weight == nil
-            @notes = "Item #{item.ref01} is missing weight."
+            @notes = "Item #{item.ref01.to_s} is missing weight."
             break
           else
             if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
@@ -93,9 +58,9 @@ class CreatePackages
     lg_pieces = 0
     cart_items.each do |item|
       if item.isGlass == 1
-        if item.ref01[-3,3].downcase == '-sm' || item.ref01[-3,3].downcase == '-md'
+        if item.ref01[-3,3].to_s.downcase == '-sm' || item.ref01[-3,3].to_s.downcase == '-md'
           sm_pieces += item.qty
-        elsif item.ref01[-3,3].downcase == '-lg'
+        elsif item.ref01[-3,3].to_s.downcase == '-lg'
           lg_pieces += item.qty
         elsif defined? item.glassConverter
           lg_pieces += item.qty * 2 if item.glassConverter == nil || item.glassConverter == 0
@@ -103,7 +68,7 @@ class CreatePackages
         else
           lg_pieces += item.qty * 2
         end
-      elsif item.isGlass == 3 && !%w{-sm -md -lg}.include?(item.ref01[-3,3])
+      elsif item.isGlass == 3 && !%w{-sm -md -lg}.include?(item.ref01[-3,3].to_s)
         lg_pieces += 1
       end
     end
@@ -190,7 +155,7 @@ class CreatePackages
   def dichro_packages(cart_items)
 
     dichro_pieces = 0
-    cart_items.each { |item| dichro_pieces += item.qty if item.isGlass == 3 && item.ref01[-4,4].downcase != '-sht' }
+    cart_items.each { |item| dichro_pieces += item.qty if item.isGlass == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
     dichro_boxes = (dichro_pieces.to_d / 6).ceil
     #if dichro_pieces > 0
     #  glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
@@ -200,6 +165,32 @@ class CreatePackages
   end
 
 
+  def calculate_boxing (add_lead_box=0, small_glass_boxes=0, large_glass_boxes=0, dichro_boxes=0)
+    boxing_charge = 0
+    large_glass_boxes = 0 if large_glass_boxes == nil
+    small_glass_boxes = 0 if small_glass_boxes == nil
+
+    if large_glass_boxes > 6 || @truck_only == 1
+      boxing_charge = 0
+
+    elsif @config[:add_boxing_charge] == true
+      boxing_charge += @config[:lead_box_charge] if add_lead_box > 0
+      boxing_charge += @config[:first_glass_box_extra_charge] if small_glass_boxes > 0 || large_glass_boxes > 0 # $15 for first glass box, $8 each additional
+      boxing_charge += (large_glass_boxes * @config[:lg_glass_box_charge].to_d)
+      boxing_charge += (small_glass_boxes * @config[:sm_glass_box_charge].to_d)
+      boxing_charge += @config[:dichro_box_charge].to_d if dichro_boxes > 0
+    end
+
+    #delphi charges $8.50 for select oversized items, from static list in config
+    #@cart_items.each do |item|
+    #  if @config[:extra_boxing].split(' ').include? item.ref01
+    #    boxing_charge += @config[:extra_boxing_charge].to_d
+    #    break
+    #  end
+    #end
+
+    boxing_charge
+  end
 
   def add_packages(qty, weight)
     (1..qty).each { @packages << Package.new((weight * 16), [5, 5, 5], :units => :imperial) }

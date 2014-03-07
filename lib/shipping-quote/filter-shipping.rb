@@ -56,15 +56,12 @@ class FilterShipping
     weight = 0
     @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
     npa_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'npa' }
-
-#binding.pry
-
     return false if weight > @config[:first_class_weight_limit].to_d || npa_items.length > 0
     true
   end
 
   def check_ormd
-    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd > 0 }
+    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd.to_i > 0 }
     ormd_items.length
   end
 

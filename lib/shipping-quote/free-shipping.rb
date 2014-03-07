@@ -50,7 +50,7 @@ class FreeShipping
   def validate_location(destination)
     pass = true
     pass = false if destination[:country] != 'US'
-    pass = false if %w[AP AE AK HI PR VI].include? destination[:state]
+    pass = false if %w[AP AE AK HI PR VI].include? destination[:province]
     pass
   end
 
