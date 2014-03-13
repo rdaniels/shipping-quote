@@ -117,7 +117,7 @@ module ShippingQuote
         expect(ship.validate_location(destination)).to eq(false)
       end
       it 'returns false for Hawaii' do
-        destination[:state] = 'HI'
+        destination[:province] = 'HI'
         ship = FreeShipping.new(cart_items, config)
         expect(ship.validate_location(destination)).to eq(false)
       end

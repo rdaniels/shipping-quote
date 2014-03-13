@@ -92,7 +92,7 @@ module ShippingQuote
         it 'returns fedex express saver and home ground' do
            ship = Shipping.new(c_hash, config)
            results = ship.runner(d_symbol)
-           puts results
+           # puts results
            # has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
            # has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
            # expect(has_express.length).to eq(1)
