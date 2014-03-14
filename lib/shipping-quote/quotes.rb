@@ -18,8 +18,8 @@ class Quote
     po_match = ['p.o','po box','p o box']
     street = destination[:street]
     street2 = destination[:street2]
-    return true if street != nil && po_match.any? {|word| street.downcase.include?(word)}
-    return true if street2 != nil && po_match.any? {|word| street2.downcase.include?(word)}
+    return true if street != nil && po_match.any? {|word| street.to_s.downcase.include?(word)}
+    return true if street2 != nil && po_match.any? {|word| street2.to_s.downcase.include?(word)}
     false
   end
 

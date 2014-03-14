@@ -13,7 +13,7 @@ class CreatePackages
 
   def package_runner(free_shipping_run=0)
     @special_order_items = @cart_items.select do |item|
-      item.backorder != nil && (item.backorder == 2 || (item.backorder > 20 && item.backorder < 300))
+      item.backorder != nil && (item.backorder.to_i == 2 || (item.backorder.to_i > 20 && item.backorder.to_i < 300))
     end
     @stock_items = @cart_items.select { |item| !special_order_items.include? item }
     create_packages(@stock_items, free_shipping_run) if @stock_items.length > 0

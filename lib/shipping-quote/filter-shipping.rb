@@ -54,7 +54,7 @@ class FilterShipping
 
   def allow_first_class
     weight = 0
-    @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
+    @cart_items.each { |item| weight += item.weight.to_d * item.qty.to_i if item.weight != nil }
     npa_items = @cart_items.find_all { |item| item.shipCode != nil && item.shipCode.downcase == 'npa' }
     return false if weight > @config[:first_class_weight_limit].to_d || npa_items.length > 0
     true
