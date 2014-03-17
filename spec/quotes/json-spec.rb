@@ -32,7 +32,7 @@ module ShippingQuote
       cart_items.each {|item| c_hash << Hashit.new(item) }
       d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
 
-      it 'returns fedex express saver and home ground' do
+      xit 'returns fedex express saver and home ground' do
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
         #puts results
@@ -52,7 +52,15 @@ module ShippingQuote
 
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
+        expect(results.length).to be > 0
+      end
+
+      it 'returns for St. Louis with glass items' do
+        destination = {"province"=>"MO", "country"=>"US", "postal_code"=>63116-3903, "city"=>"SAINT LOUIS", "street"=>"3956 CONNECTICUT ST", "street2"=>""}
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(results.length).to be > 0
       end
     end
 

@@ -1,3 +1,4 @@
+require 'pry'
 require_relative 'filter-shipping'
 
 class CreatePackages
@@ -57,14 +58,14 @@ class CreatePackages
     sm_pieces = 0
     lg_pieces = 0
     cart_items.each do |item|
-      if item.isGlass == 1
+      if item.isGlass.to_i == 1
         if item.ref01[-3,3].to_s.downcase == '-sm' || item.ref01[-3,3].to_s.downcase == '-md'
-          sm_pieces += item.qty
+          sm_pieces += item.qty.to_i
         elsif item.ref01[-3,3].to_s.downcase == '-lg'
-          lg_pieces += item.qty
+          lg_pieces += item.qty.to_i
         elsif defined? item.glassConverter
-          lg_pieces += item.qty * 2 if item.glassConverter == nil || item.glassConverter == 0
-          lg_pieces += item.qty * item.glassConverter if item.glassConverter != nil && item.glassConverter > 0
+          lg_pieces += item.qty.to_i * 2 if item.glassConverter.to_i == 0
+          lg_pieces += item.qty.to_i * item.glassConverter.to_i if item.glassConverter.to_i > 0
         else
           lg_pieces += item.qty * 2
         end
