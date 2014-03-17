@@ -65,8 +65,11 @@ destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal
 
 #puts destination
 #config[:international_carriers] = nil
+
+beginning = Time.now
 ship = ShippingQuote::Shipping.new(cart_items, config)
 results = ship.runner(destination)
+puts "Time elapsed #{Time.now - beginning} seconds"
 puts results
 #puts ship.packages.length
 #puts ship.packages[0]
