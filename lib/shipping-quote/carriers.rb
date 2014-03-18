@@ -10,13 +10,13 @@ class PullCarriers
   def initialize(config)
     @config = config
     @notes = []
-    @diskcache = Diskcached.new('./tmp/cache', 10800) # 3 hours
+    @diskcache = Diskcached.new('/tmp/shipping', 10800) # 3 hours
   end
 
   def pull_fedex (origin, location_destination, packages)
     cache_name = 'fedex' + packages_to_cache_name(location_destination, packages)
     #binding.pry
-    if Pathname.new("./tmp/cache/" + cache_name + '.cache').exist?
+    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
 
       fedex_rates = @diskcache.get(cache_name)
     else # Diskcached::NotFound # prevents easy replacement, but is safer. - See more at: http://mervine.net/diskcached-simple-disk-cacheing-for-ruby#sthash.0gD5Y6nY.dpuf
@@ -37,7 +37,7 @@ class PullCarriers
 
   def pull_usps (origin, location_destination, packages)
     cache_name = 'usps' + packages_to_cache_name(location_destination, packages)
-    if Pathname.new("./tmp/cache/" + cache_name + '.cache').exist?
+    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
       usps_rates = @diskcache.get(cache_name)
     else
       begin
@@ -56,7 +56,7 @@ class PullCarriers
 
   def pull_ups (origin, location_destination, packages)
     cache_name = 'ups' + packages_to_cache_name(location_destination, packages)
-    if Pathname.new("./tmp/cache/" + cache_name + '.cache').exist?
+    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
       ups_rates = @diskcache.get(cache_name)
     else
       begin
