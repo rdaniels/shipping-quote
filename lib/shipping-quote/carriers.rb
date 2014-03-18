@@ -1,4 +1,4 @@
-require 'pry'
+#require 'pry'
 require 'active_shipping'
 require 'diskcached'
 include ActiveMerchant::Shipping
