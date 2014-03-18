@@ -70,7 +70,7 @@ class FilterShipping
     @cart_items.each do |item|
       if item.isGlass == 1
         multiplier = 2
-        multiplier = item.glassConverter if item.glassConverter != nil && item.glassConverter > 0
+        multiplier = item.glassConverter.to_i if item.glassConverter != nil && item.glassConverter.to_i > 0
         count_glass += (item.qty * multiplier)
       end
     end
