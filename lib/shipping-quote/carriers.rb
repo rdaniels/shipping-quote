@@ -1,6 +1,7 @@
 #require 'pry'
 require 'active_shipping'
-require 'diskcached'
+#require 'atomic_mem_cache_store'
+include ActiveSupport::Cache
 include ActiveMerchant::Shipping
 
 
@@ -10,21 +11,20 @@ class PullCarriers
   def initialize(config)
     @config = config
     @notes = []
-    @diskcache = Diskcached.new('/tmp/shipping', 10800) # 3 hours
+    #@diskcache = MemCacheStore.new #('/tmp/shipping', 10800) # 3 hours
+    @cache = FileStore.new('./tmp/cache')
   end
 
   def pull_fedex (origin, location_destination, packages)
     cache_name = 'fedex' + packages_to_cache_name(location_destination, packages)
-    #binding.pry
-    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
 
-      fedex_rates = @diskcache.get(cache_name)
-    else # Diskcached::NotFound # prevents easy replacement, but is safer. - See more at: http://mervine.net/diskcached-simple-disk-cacheing-for-ruby#sthash.0gD5Y6nY.dpuf
+    fedex_rates = @cache.read(cache_name)
+    if fedex_rates == nil
       begin
         fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password], key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
         response = fedex.find_rates(origin, location_destination, packages)
         fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-        @diskcache.set(cache_name, fedex_rates)
+        @cache.write(cache_name, fedex_rates, :expires_in => 2.hours)
       rescue #=> error
         #raise error
         fedex_rates = []
@@ -37,14 +37,14 @@ class PullCarriers
 
   def pull_usps (origin, location_destination, packages)
     cache_name = 'usps' + packages_to_cache_name(location_destination, packages)
-    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
-      usps_rates = @diskcache.get(cache_name)
-    else
+
+    usps_rates = @cache.read(cache_name)
+    if usps_rates == nil
       begin
         usps = USPS.new(login: @config[:usps][:login])
         response = usps.find_rates(origin, location_destination, packages)
         usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-        @diskcache.set(cache_name, usps_rates)
+        @cache.write(cache_name, usps_rates, :expires_in => 2.hours)
       rescue #=> error
         usps_rates = []
         @notes << 'USPS can not produce quotes at this time' # + error.response.message
@@ -56,14 +56,14 @@ class PullCarriers
 
   def pull_ups (origin, location_destination, packages)
     cache_name = 'ups' + packages_to_cache_name(location_destination, packages)
-    if Pathname.new("/tmp/shipping/" + cache_name + '.cache').exist?
-      ups_rates = @diskcache.get(cache_name)
-    else
+
+    ups_rates = @cache.read(cache_name)
+    if ups_rates == nil
       begin
         ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key])
         response = ups.find_rates(origin, location_destination, packages)
         ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-        @diskcache.set(cache_name, ups_rates)
+        @cache.write(cache_name, ups_rates, :expires_in => 2.hours)
       rescue #=> error
         ups_rates = []
         @notes << 'UPS can not produce quotes at this time' # + error.response.message

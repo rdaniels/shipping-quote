@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bundler', '~> 1.3'
   spec.add_dependency 'rake'
   spec.add_dependency 'active_shipping'
-  spec.add_dependency 'diskcached'
+  #spec.add_dependency 'atomic_mem_cache_store'
 
   spec.add_development_dependency 'rspec-core', '3.0.0.beta1'
   spec.add_development_dependency 'pry-plus'
