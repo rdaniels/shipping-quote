@@ -16,6 +16,7 @@
 :free_shipping:
     :start_date: nil
     :end_date: nil
+    :excluded_price_class: '4,6'
 
 
 #boxing charges

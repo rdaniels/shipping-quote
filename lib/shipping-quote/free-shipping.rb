@@ -32,13 +32,13 @@ class FreeShipping
     pass = true
     start_date = @config[:free_shipping][:start_date]
     end_date = @config[:free_shipping][:end_date]
+
     start_date = Date.parse(start_date) if start_date.class == String && start_date != 'nil'
     end_date = Date.parse(end_date) if end_date.class == String && end_date != 'nil'
 
-    pass = false if start_date == nil
-    pass = false if end_date == nil
-    pass = false if start_date == 'nil'
-    pass = false if end_date == 'nil'
+    start_date = Date.today << 1 if start_date == nil || start_date == 'nil'
+    end_date = Date.today >> 1 if end_date == nil || end_date == 'nil'
+
     if pass == true
       pass = false if start_date > Date.today
       pass = false if end_date < Date.today

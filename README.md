@@ -61,7 +61,8 @@ example destination
         :street2 => nil,
         :province => 'FL',
         :city => 'Tampa',
-        :postal_code => '33609'}
+        :postal_code => '33609'
+        :price_class => 1 }
 
 
 ## Shipping Rules
