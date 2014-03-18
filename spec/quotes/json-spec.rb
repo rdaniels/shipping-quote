@@ -34,21 +34,53 @@ module ShippingQuote
 
 
 
-      it "country = 'US', street = 'po box 41246', street2 = '', province = 'TN', city = 'NASHVILLE', postal_code = '37204' "
-      it "country = 'US', street = '83 maple ave', street2 = '', province = 'ct', city = 'windsor', postal_code = '06095' "
-
-
-
-
-      it 'returns fedex express saver and home ground' do
+      it 'returns FedEx express saver and home ground' do
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        #puts results
         has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
         expect(has_express.length).to eq(1)
         expect(has_ground.length).to be > 0
       end
+
+      it 'returns FedEx options' do
+        destination = {"country"=>'US', 'street'=>'83 maple ave', 'street2'=>'', 'province'=>'ct', 'city'=>'windsor', 'postal_code' =>'06095' }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
+        has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        expect(has_express.length).to eq(1)
+        expect(has_ground.length).to be > 0
+      end
+
+      it 'returns for St. Louis with glass items' do
+        destination = {"province"=>"MO", "country"=>"US", "postal_code"=>'63116-3903', "city"=>"SAINT LOUIS", "street"=>"3956 CONNECTICUT ST", "street2"=>""}
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(results.length).to be > 0
+      end
+
+
+      it 'returns FedEx options 36765-3802' do
+        destination = {'country'=>'US', 'street'=>'8622 AL HIGHWAY 61', 'street2'=>'', 'province'=>'AL', 'city'=>'NEWBERN', 'postal_code'=>'36765-3802' }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(results.length).to be > 0
+      end
+
+
+      it 'returns USPS options' do
+        destination = {"country"=>'US', 'street'=>'po box 41246', 'street2'=>'', 'province'=>'TN', 'city'=>'NASHVILLE', 'postal_code'=>'37204' }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        has_usps = results.select{|key, value| key.to_s.match(/^USPS/)}
+        expect(has_usps.length).to be > 0
+      end
+
 
       it 'does not return string to fixnum error' do
         destination = {"province"=>"LA", "country"=>"US", "postal_code"=>"70630-5118", "city"=>"BELL CITY", "street"=>"268 SWEET LAKE CAMP RD", "street2"=>""}
@@ -63,14 +95,7 @@ module ShippingQuote
         expect(results.length).to be > 0
       end
 
-      xit 'returns for St. Louis with glass items' do
-        destination = {"province"=>"MO", "country"=>"US", "postal_code"=>63116-3903, "city"=>"SAINT LOUIS", "street"=>"3956 CONNECTICUT ST", "street2"=>""}
-        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-        ship = Shipping.new(c_hash, config)
-        results = ship.runner(d_symbol)
-        puts results
-        #expect(results.length).to be > 0
-      end
+
     end
 
   end

@@ -32,10 +32,10 @@ class FilterShipping
       # remove the 1-Day, 2-Day, etc.
       shown_rates.collect! { |rate| (rate[0].include?('-Day')) ? [rate[0].gsub(/[0-9]/,'').gsub(' -Day',''), rate[1]] : rate }
 
-
       is_po_box = 0
       is_po_box = 1 if destination[:street] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street].to_s.downcase =~ /#{w}/ }
       is_po_box = 1 if destination[:street2] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street2].to_s.downcase =~ /#{w}/ }
+
       shown_rates.delete_if { |rate| rate[0][0..4] == 'FedEx' } if is_po_box == 1
 
       ormd = check_ormd

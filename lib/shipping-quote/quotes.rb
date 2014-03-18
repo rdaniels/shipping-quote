@@ -1,4 +1,4 @@
-# require 'pry'
+ require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
 require_relative 'carriers'
@@ -71,10 +71,7 @@ class Quote
         all_rates += [['Truck Shipping', rl_quote ]]
       end
     end
-    begin
-      all_rates.each { |line| line[1] = (line[1] * @config[:rate_multiplier].to_d).round(0) }
-    rescue
-    end
+
     all_rates = [] if all_rates == nil
     all_rates
   end
@@ -82,8 +79,12 @@ class Quote
   def multiplier(quotes)
     if @config[:rate_multiplier].to_d != 1 && quotes != nil && quotes.length > 0
       quotes.each do |q|
-        if q[0] == 'USPS Media Mail' && @config[:media_mail_multiplier].to_d != 1
+        if q[0][0..4] == 'FedEx' && @config[:fedex_multiplier].to_d != 1
+          q[1] = q[1] * @config[:fedex_multiplier].to_d
+
+        elsif q[0] == 'USPS Media Mail' && @config[:media_mail_multiplier].to_d != 1
           q[1] = q[1] * @config[:media_mail_multiplier].to_d
+
         elsif q[0] !=  'Truck Shipping'
           q[1] = q[1] * @config[:rate_multiplier].to_d
         end
