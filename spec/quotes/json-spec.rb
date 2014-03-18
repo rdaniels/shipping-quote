@@ -32,6 +32,14 @@ module ShippingQuote
       cart_items.each {|item| c_hash << Hashit.new(item) }
       d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
 
+
+
+      it "country = 'US', street = 'po box 41246', street2 = '', province = 'TN', city = 'NASHVILLE', postal_code = '37204' "
+      it "country = 'US', street = '83 maple ave', street2 = '', province = 'ct', city = 'windsor', postal_code = '06095' "
+
+
+
+
       it 'returns fedex express saver and home ground' do
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
