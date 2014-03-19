@@ -12,10 +12,12 @@ class FreeShipping
 
 
   def free_ship_ok(free_ship, destination)
-    return false if free_ship == nil || free_ship == 0
+    return false if free_ship.to_i == 0
     return false if validate_location(destination) == false
-    return false if validate_date == false && free_ship == 1
-    return true if free_ship == 2 || free_ship == 3
+    return false if validate_date == false && free_ship.to_i == 1
+    return true if validate_date == true && free_ship.to_i == 1
+    return true if free_ship.to_i == 2 || free_ship.to_i == 3
+    false
   end
 
 

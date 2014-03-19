@@ -1,6 +1,5 @@
 #require 'pry'
 require 'active_shipping'
-#require 'atomic_mem_cache_store'
 include ActiveSupport::Cache
 include ActiveMerchant::Shipping
 
@@ -19,7 +18,7 @@ class PullCarriers
     cache_name = 'fedex' + packages_to_cache_name(location_destination, packages)
 
     fedex_rates = @cache.read(cache_name)
-    if fedex_rates == nil
+    if fedex_rates == nil || fedex_rates == []
       begin
         fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password], key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
         response = fedex.find_rates(origin, location_destination, packages)
@@ -39,7 +38,7 @@ class PullCarriers
     cache_name = 'usps' + packages_to_cache_name(location_destination, packages)
 
     usps_rates = @cache.read(cache_name)
-    if usps_rates == nil
+    if usps_rates == nil || usps_rates = []
       begin
         usps = USPS.new(login: @config[:usps][:login])
         response = usps.find_rates(origin, location_destination, packages)
@@ -58,7 +57,7 @@ class PullCarriers
     cache_name = 'ups' + packages_to_cache_name(location_destination, packages)
 
     ups_rates = @cache.read(cache_name)
-    if ups_rates == nil
+    if ups_rates == nil || ups_rates = []
       begin
         ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key])
         response = ups.find_rates(origin, location_destination, packages)

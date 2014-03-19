@@ -135,7 +135,7 @@ module ShippingQuote
       it 'returns a free ship option' do
         destination = {'country'=>'US', 'street'=>'9 RIDGE RD', 'street2'=>'', 'province'=>'VA', 'city'=>'HARTFIELD', 'postal_code'=>'23071-3130' }
         cart_items = [
-            {"shipCode"=>"GLA", "glassConverter"=>"", "weight"=>"6.00", "qty"=>"1", "ref01"=>"5375", "backorder"=>"2", "ormd"=>"0", "freeShipping"=>"2", "isGlass"=>""},
+            {"shipCode"=>"UPS", "glassConverter"=>"", "weight"=>"6.00", "qty"=>"1", "ref01"=>"5375", "backorder"=>"2", "ormd"=>"0", "freeShipping"=>"2", "isGlass"=>""},
             {"shipCode"=>"GLA", "glassConverter"=>"", "weight"=>"12.00", "qty"=>"1", "ref01"=>"5371", "backorder"=>"2", "ormd"=>"0", "freeShipping"=>"2", "isGlass"=>""},
             {"shipCode"=>"GLA", "glassConverter"=>"", "weight"=>"6.00", "qty"=>"1", "ref01"=>"5366", "backorder"=>"0", "ormd"=>"0", "freeShipping"=>"2", "isGlass"=>""},
             {"shipCode"=>"GLA", "glassConverter"=>"", "weight"=>"6.00", "qty"=>"1", "ref01"=>"5368", "backorder"=>"0", "ormd"=>"0", "freeShipping"=>"2", "isGlass"=>""}
@@ -146,6 +146,19 @@ module ShippingQuote
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
         expect(results[0][1]).to eq(0)
+      end
+
+      it 'backorder=3 test - does not return a free ship option' do
+        destination = {'country'=>'US', 'street'=>'9 RIDGE RD', 'street2'=>'', 'province'=>'VA', 'city'=>'HARTFIELD', 'postal_code'=>'23071-3130' }
+        cart_items = [
+            {"shipCode"=>"UPS", "glassConverter"=>"", "weight"=>"6.00", "qty"=>"1", "ref01"=>"5375", "backorder"=>"3", "ormd"=>"0", "freeShipping"=>"0", "isGlass"=>""}
+          ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(results[0][1]).to be > 0
       end
 
       it 'returns a free ship option' do
@@ -160,6 +173,29 @@ module ShippingQuote
         results = ship.runner(d_symbol)
         expect(results[0][1]).to eq(0)
       end
+
+      it 'returns quote' do
+        destination = {'country'=>'US', 'street'=>'6850 S ROLLING HILLS DR', 'street2'=>'', 'province'=>'MI', 'city'=>'TRAVERSE CITY', 'postal_code'=>'49684-6505', 'price_class'=>'4' }
+        cart_items = [
+            {"shipCode"=>"", "glassConverter"=>"3", "weight"=>"", "qty"=>"3", "ref01"=>"B110038-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"2", "weight"=>"", "qty"=>"5", "ref01"=>"B010038-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"LRG", "glassConverter"=>"2", "weight"=>"0.00", "qty"=>"5", "ref01"=>"B110151-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"2", "weight"=>"8", "qty"=>"2", "ref01"=>"B012030-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"LRG", "glassConverter"=>"2", "weight"=>"0", "qty"=>"2", "ref01"=>"B032030-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"2", "weight"=>"8", "qty"=>"3", "ref01"=>"B011630-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"2", "weight"=>"8", "qty"=>"3", "ref01"=>"B012630-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"1", "weight"=>"", "qty"=>"3", "ref01"=>"B002430-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"},
+            {"shipCode"=>"", "glassConverter"=>"2", "weight"=>"", "qty"=>"3", "ref01"=>"B013730-SHT", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"0", "isGlass"=>"1"}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(results.length).to be > 0
+
+      end
+
 
     end
 

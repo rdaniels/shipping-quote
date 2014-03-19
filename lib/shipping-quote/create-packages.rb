@@ -1,4 +1,4 @@
-# require 'pry'
+#require 'pry'
 require_relative 'filter-shipping'
 
 class CreatePackages
@@ -29,7 +29,6 @@ class CreatePackages
     free_shipping = FreeShipping.new(cart_items,@config)
     cart_items.each do |item|
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
-
       if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && (item.isGlass == nil || item.isGlass.to_i == 0 || item.isGlass == 2 || item.isGlass == 3)
 
         if item.ref01.to_s[-4,4] != '-sht'  # dichro sheet added as large glass piece

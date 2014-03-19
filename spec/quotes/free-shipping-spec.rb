@@ -15,6 +15,7 @@ module ShippingQuote
 
     describe 'sometimes free ship items' do
       it 'free shipping for freeship=1 within end_date' do
+        #config[:free_shipping][:end_date] = '1-1-2020'
         item.stub(:freeShipping).and_return(1)
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
