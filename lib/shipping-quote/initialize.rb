@@ -50,6 +50,8 @@ module ShippingQuote
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 
+#binding.pry
+
       # free shipping
       if allow_free_ship == true && allow_price_class(destination) == true
         free_shipping = FreeShipping.new(@cart_items,@config)
@@ -74,10 +76,11 @@ module ShippingQuote
 
     def allow_price_class(destination)
       price_class = destination[:price_class].to_s
-      return true if price_class == nil
+      return true if price_class == ''
       return true if price_class == 'nil'
       return true if @config[:free_shipping][:excluded_price_class] == nil
       return true if @config[:free_shipping][:excluded_price_class] == 'nil'
+      return true if @config[:free_shipping][:excluded_price_class] == ''
 
       @config[:free_shipping][:excluded_price_class].split(',').include?(price_class)
     end

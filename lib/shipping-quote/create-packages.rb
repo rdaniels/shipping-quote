@@ -37,10 +37,10 @@ class CreatePackages
             @notes = "Item #{item.ref01.to_s} is missing weight."
             break
           else
-            if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight > @config[:box_max_weight] && (shipCode == 'UPS' || shipCode == ''))
-              add_packages(item.qty, item.weight)
+            if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight.to_d > @config[:box_max_weight].to_d && (shipCode == 'UPS' || shipCode == ''))
+              add_packages(item.qty.to_i, item.weight.to_d)
             elsif shipCode != 'LEA'
-              regular_item_weight += item.weight * item.qty
+              regular_item_weight += item.weight.to_d * item.qty.to_i
             end
           end
         end

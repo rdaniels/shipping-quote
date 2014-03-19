@@ -50,7 +50,7 @@ class RLQuote
     kiln = @cart_items.find_all { |item| item.name != nil && item.name.match(/kiln/) && item.weight > 15 }
     x = 85 if kiln.length > 0
 
-    large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass == 1 }
+    large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass.to_i == 1 }
     sum = large_sheet.map(&:qty).inject(0, &:+)
     x = 65 if sum >= 30
 
@@ -61,7 +61,7 @@ class RLQuote
 
   def check_ormd
     x = ''
-    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd > 0 }
+    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd.to_i > 0 }
     x = 'X' if ormd_items.length > 0
     x
   end
@@ -74,7 +74,7 @@ class RLQuote
 
   def get_weight(sm_glass_pieces=0, lg_glass_pieces=0)
     weight = 0
-    @cart_items.each { |item| weight += item.weight * item.qty if item.weight != nil }
+    @cart_items.each { |item| weight += item.weight.to_d * item.qty.to_i if item.weight != nil }
     weight += sm_glass_pieces * 2
     weight += lg_glass_pieces * 5
     weight

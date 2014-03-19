@@ -96,6 +96,37 @@ module ShippingQuote
       end
 
 
+
+      it 'gift card check' do
+        cart_items = [
+          {"shipCode"=>"UPS", "glassConverter"=>"", "weight"=>"0.01", "qty"=>"1", "ref01"=>"GC50", "backorder"=>"0", "ormd"=>"", "freeShipping"=>"2", "isGlass"=>"0"}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        has_free = results.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
+        expect(has_free[0][1]).to eq(0)
+      end
+
+
+      it 'truck test' do
+        config[:us_carriers] << 'RL'
+        config[:us_carriers] << 'FedEx'
+        destination = {"country"=>'US', 'street'=>'215 KLEIN RD', 'street2'=>'', 'province'=>'PA', 'city'=>'GLENSHAW', 'postal_code'=>'15116-3015' }
+        cart_items = [
+          {"shipCode"=>"UPS", "glassConverter"=>"", "weight"=>"2.81", "qty"=>"1", "ref01"=>"6903", "backorder"=>"0", "ormd"=>"1", "freeShipping"=>"0", "isGlass"=>""},
+          {"shipCode"=>"TRK", "glassConverter"=>"", "weight"=>"115.00", "qty"=>"1", "ref01"=>"SPREM", "backorder"=>"0", "ormd"=>"0", "freeShipping"=>"0", "isGlass"=>"0"}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        #puts results
+        expect(results.length).to be > 0
+      end
+
     end
 
   end
