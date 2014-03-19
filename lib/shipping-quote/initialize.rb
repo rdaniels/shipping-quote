@@ -1,4 +1,4 @@
-# require 'pry'
+#require 'pry'
 
 module ShippingQuote
   require_relative 'quotes'
@@ -84,7 +84,7 @@ module ShippingQuote
       return true if @config[:free_shipping][:excluded_price_class] == 'nil'
       return true if @config[:free_shipping][:excluded_price_class] == ''
 
-      @config[:free_shipping][:excluded_price_class].split(',').include?(price_class)
+      !@config[:free_shipping][:excluded_price_class].split(',').include?(price_class)
     end
 
     def truck_only
