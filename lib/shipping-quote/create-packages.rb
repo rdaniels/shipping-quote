@@ -18,7 +18,7 @@ class CreatePackages
     end
     @stock_items = @cart_items.select { |item| !special_order_items.include? item }
     create_packages(@stock_items, free_shipping_run) if @stock_items.length > 0
-    create_packages(@special_order_items) if @special_order_items.length > 0
+    create_packages(@special_order_items, free_shipping_run) if @special_order_items.length > 0
     @packages
   end
 

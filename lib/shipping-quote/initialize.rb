@@ -50,7 +50,6 @@ module ShippingQuote
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 
-#binding.pry
 
       # free shipping
       if allow_free_ship == true && allow_price_class(destination) == true
@@ -60,6 +59,9 @@ module ShippingQuote
           ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
           ship_free.package_runner(1)
           packages_free_removed = ship_free.packages
+
+#binding.pry
+
           if packages_free_removed.map{|p| p.weight}.sum != packages.map{|p| p.weight}.sum
             if packages_free_removed == nil || packages_free_removed.length == 0
               filtered_quotes = free_shipping.update_quote(filtered_quotes, 0, lowest_priced)
