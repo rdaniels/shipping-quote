@@ -50,7 +50,7 @@ class RLQuote
     kiln = @cart_items.find_all { |item| item.name != nil && item.name.match(/kiln/) && item.weight > 15 }
     x = 85 if kiln.length > 0
 
-    large_sheet = @cart_items.find_all { |item| (item.ref01.match(/-lg/) || item.ref01.match(/-sht/)) && item.isGlass.to_i == 1 }
+    large_sheet = @cart_items.find_all { |item| (item.ref01.to_s.match(/-lg/) || item.ref01.to_s.match(/-sht/)) && item.isGlass.to_i == 1 }
     sum = large_sheet.map(&:qty).inject(0, &:+)
     x = 65 if sum >= 30
 
