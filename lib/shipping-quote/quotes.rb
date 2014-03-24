@@ -67,11 +67,11 @@ class Quote
 
     if country_key.include?('RL') && @truck_only.to_i == 1
         rl = RLQuote.new(@cart_items, @config)
-        rl_quote = (rl.freight_request(destination)*100).to_i
+        rl_quote = (rl.freight_request(destination)).to_i
         # retry
-        rl_quote = (rl.freight_request(destination)*100).to_i if rl_quote == 0
-        rl_quote = (rl.freight_request(destination)*100).to_i if rl_quote == 0
-        all_rates += [['Truck Shipping', rl_quote ]]
+        rl_quote = (rl.freight_request(destination)).to_i if rl_quote == 0
+        rl_quote = (rl.freight_request(destination)).to_i if rl_quote == 0
+        all_rates += [['Truck Shipping', rl_quote*100 ]] if rl_quote != 0
     end
 
     all_rates = [] if all_rates == nil

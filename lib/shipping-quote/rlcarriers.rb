@@ -28,17 +28,12 @@ class RLQuote
     res = http_get("www.rlcarriers.com", path, params)
     my_hash = Hash.from_xml(res)
 
-
-
     if my_hash ['xml']['ratequote']['netcharges'] == nil
       @notes == 'Truck Quote not available'
-      nil
+      0
     else
       my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
     end
-
-
-
     # begin
     #   res = http_get("www.rlcarriers.com", path, params)
     #   my_hash = Hash.from_xml(res)
