@@ -38,7 +38,7 @@ class PullCarriers
     cache_name = 'usps' + packages_to_cache_name(location_destination, packages)
 
     usps_rates = @cache.read(cache_name)
-    if usps_rates == nil || usps_rates = []
+    if usps_rates == nil || usps_rates == []
       begin
         usps = USPS.new(login: @config[:usps][:login])
         response = usps.find_rates(origin, location_destination, packages)
@@ -57,7 +57,7 @@ class PullCarriers
     cache_name = 'ups' + packages_to_cache_name(location_destination, packages)
 
     ups_rates = @cache.read(cache_name)
-    if ups_rates == nil || ups_rates = []
+    if ups_rates == nil || ups_rates == []
       begin
         ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key])
         response = ups.find_rates(origin, location_destination, packages)

@@ -50,26 +50,28 @@ class Quote
       country_key.reject! {|x| x != 'RL'} if ship_selected[0..4] == 'Truck'
     end
 
+#binding.pry
 
-    if country_key.include? 'FedEx'
+    if country_key.include?('FedEx') && @truck_only.to_i == 0
       fedex_rates = c.pull_fedex(origin, location_destination, packages)
       all_rates += fedex_rates
     end
-    if country_key.include? 'USPS'
+    if country_key.include?('USPS') && @truck_only.to_i == 0
       usps_rates = c.pull_usps(origin, location_destination, packages)
       all_rates += usps_rates
     end
-    if country_key.include? 'UPS'
+    if country_key.include?('UPS') && @truck_only.to_i == 0
       ups_rates = c.pull_ups(origin, location_destination, packages)
       all_rates += ups_rates
     end
 
-    if country_key.include? 'RL'
-      if @truck_only == 1
+    if country_key.include?('RL') && @truck_only.to_i == 1
         rl = RLQuote.new(@cart_items, @config)
         rl_quote = (rl.freight_request(destination)*100).to_i
+        # retry
+        rl_quote = (rl.freight_request(destination)*100).to_i if rl_quote == 0
+        rl_quote = (rl.freight_request(destination)*100).to_i if rl_quote == 0
         all_rates += [['Truck Shipping', rl_quote ]]
-      end
     end
 
     all_rates = [] if all_rates == nil

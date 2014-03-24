@@ -10,6 +10,7 @@ module ShippingQuote
     let!(:cart_items) { [] }
     let!(:item) { double('item', ref01: '3000', name:'solder roll', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:item2) { double('item', ref01: 'ab123', name:'widget', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item3) { double('item', ref01: 'srakpak', name:'Spectrum Rack Pack - 80 Pieces', shipCode: 'TRK', isGlass: nil, qty: 1, weight: 145, backorder: 0, ormd: nil, glassConverter: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
     #let!(:destination) { { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}  }
 
@@ -50,14 +51,34 @@ module ShippingQuote
       it 'Runner returns only Truck Shipping over $40 if shipCode = TRK' do
         item.stub(:shipCode).and_return('TRK')
         cart_items[0] = item
+        cart_items[1] = item2
+        cart_items[2] = item3
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
         expect(quote[0][0]).to eq('Truck Shipping')
         expect(quote.length).to eq(1)
         expect(quote[0][1]).to be > 40
       end
-      it 'marks as residential if customer priceclass = 6'
-      it 'does not apply multiplier to Truck Shipping'
+
+
+      it 'returns shipping quote less than $200' do
+        item.stub(:shipCode).and_return('SHA')
+        item.stub(:weight).and_return('12')
+        item2.stub(:shipCode).and_return('GLA')
+        item2.stub(:weight).and_return('8')
+        cart_items[0] = item
+        cart_items[1] = item2
+        cart_items[2] = item3
+        ship = RLQuote.new(cart_items, config)
+        quote = ship.freight_request(destination)
+        expect(quote[0][0]).to eq('Truck Shipping')
+        expect(quote.length).to eq(1)
+        expect(quote[0][1]).to be < 200
+      end
+
+
+
+
     end
   end
 end
