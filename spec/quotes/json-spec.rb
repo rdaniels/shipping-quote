@@ -197,6 +197,27 @@ module ShippingQuote
       end
 
 
+      it 'returns quote' do
+        destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'NY', 'city'=>'Baiting Hollow', 'postal_code'=>'11933', 'price_class'=>'1' }
+        cart_items = [
+            {'qty'=>'1', 'ref01'=>'S161RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S152RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S111RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S100RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S1009-MD', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'Y5002SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'unit_weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=> '0'},
+            {'qty'=>'1', 'ref01'=>'Y1100SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'unit_weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>' 0'}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts results
+
+
+      end
+
     end
 
   end

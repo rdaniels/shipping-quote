@@ -1,4 +1,3 @@
-# require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
 require_relative 'carriers'
@@ -50,7 +49,6 @@ class Quote
       country_key.reject! {|x| x != 'RL'} if ship_selected[0..4] == 'Truck'
     end
 
-#binding.pry
 
     if country_key.include?('FedEx') && @truck_only.to_i == 0
       fedex_rates = c.pull_fedex(origin, location_destination, packages)
@@ -80,11 +78,18 @@ class Quote
 
   def multiplier(quotes)
     if @config[:rate_multiplier].to_d != 1 && quotes != nil && quotes.length > 0
+
+
+#binding.pry
+
       quotes.each do |q|
-        if q[0][0..4] == 'FedEx' && @config[:fedex_multiplier].to_d != 1
-          q[1] = q[1] * @config[:fedex_multiplier].to_d
+        if q[0][0..4] == 'FedEx' && q[0][0..7] != 'FedEx Gr'  && @config[:fedex_express_multiplier].to_d != 1
+          q[1] = q[1] * @config[:fedex_express_multiplier].to_d
 
         elsif q[0] == 'USPS Media Mail' && @config[:media_mail_multiplier].to_d != 1
+          q[1] = q[1] * @config[:media_mail_multiplier].to_d
+
+        elsif q[0] == 'USPS First-Class Mail Parcel' && @config[:media_mail_multiplier].to_d != 1
           q[1] = q[1] * @config[:media_mail_multiplier].to_d
 
         elsif q[0] !=  'Truck Shipping'

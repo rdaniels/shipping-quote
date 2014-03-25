@@ -84,7 +84,7 @@ module ShippingQuote
         expect(has_media.length).to eq(1)
       end
 
-      it 'rate multiplier applied to first class' do
+      it 'media mail multiplier applied to first class' do
         item.stub(:weight).and_return(0.1)
         cart_items[0] = item
         ship = CreatePackages.new(cart_items, config, destination)
@@ -96,7 +96,7 @@ module ShippingQuote
         media_before = filtered_quotes.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}[0][1].to_i
         new_quote = quote.multiplier(filtered_quotes)
         media_after = new_quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}[0][1].to_i
-        expect(media_after).to eq((media_before * config[:rate_multiplier]).to_i)
+        expect(media_after).to eq((media_before * config[:media_mail_multiplier]).to_i)
       end
 
       it 'media mail multiplier applied to media mail class' do
