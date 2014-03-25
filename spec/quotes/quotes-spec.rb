@@ -15,6 +15,7 @@ module ShippingQuote
 
      it 'returns blank when quote <= boxing charge'
 
+
      it 'returns fedex express saver and home ground' do
        cart_items[0] = item
        ship = Shipping.new(cart_items, config)
@@ -46,6 +47,8 @@ module ShippingQuote
        expect(has_ground.length).to be > 0
        expect(has_usps.length).to eq(0)
      end
+
+
      it 'returns multiple quotes for Canada' do
        destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
        cart_items[0] = item
@@ -87,7 +90,13 @@ module ShippingQuote
         ca_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         expect(has_express[0][1]).to be < ca_express[0][1]
       end
-
+       it 'changes country to VI when state = VI' do
+         destination = { :country => 'US', :province => 'VI', :city => 'Mississauga', :postal_code => '00802'}
+         cart_items[0] = item
+         ship = Shipping.new(cart_items, config)
+         results = ship.runner(destination)
+         expect(results.length).to be > 0
+       end
     end
 
 

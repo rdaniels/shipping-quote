@@ -45,10 +45,15 @@ module ShippingQuote
       packages = ship.package_runner
       @notes = ship.notes
       @boxing_charge = ship.boxing
+      destination[:country] = 'VI' if destination[:country] == 'US' && destination[:province] == 'VI'
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
+      if quotes.length > 0 && filtered_quotes.length == 0
+        @config[:shown_rates] = @config[:po_box_rates]
+        filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
+      end
 
       # free shipping
       if allow_free_ship == true && allow_price_class(destination) == true
