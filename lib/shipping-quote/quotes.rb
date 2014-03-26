@@ -42,6 +42,10 @@ class Quote
       country_key << 'USPS' if !country_key.include?('USPS')
       @config[:shown_rates] += @config[:po_box_rates]
     end
+    if %w{GU VI PR AP AE AK HI}.include?(destination[:province])
+      country_key << 'USPS' if !country_key.include?('USPS')
+      @config[:shown_rates] += @config[:po_box_rates]
+    end
     if ship_selected != nil
       country_key.reject! {|x| x != 'FedEx'} if ship_selected[0..4] == 'FedEx'
       country_key.reject! {|x| x != 'USPS'} if ship_selected[0..3] == 'USPS'
