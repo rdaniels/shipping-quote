@@ -90,13 +90,22 @@ module ShippingQuote
         ca_express = quote.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         expect(has_express[0][1]).to be < ca_express[0][1]
       end
-       it 'changes country to VI when state = VI' do
+      it 'changes country to VI when state = VI' do
          destination = { :country => 'US', :province => 'VI', :city => 'Mississauga', :postal_code => '00802'}
          cart_items[0] = item
          ship = Shipping.new(cart_items, config)
          results = ship.runner(destination)
          expect(results.length).to be > 0
        end
+
+      it 'handles VI' do
+        destination = { :province => "international", :country=>"VI", :postal_code=>"00802", :city=>"Mississauga", :street=>"", :street2=>""}
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        results = ship.runner(destination)
+        expect(results.length).to be > 0
+      end
+
     end
 
 

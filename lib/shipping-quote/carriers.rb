@@ -49,6 +49,10 @@ class PullCarriers
         @notes << 'USPS can not produce quotes at this time' # + error.response.message
       end
     end
+
+
+#binding.pry
+
     usps_rates
   end
 

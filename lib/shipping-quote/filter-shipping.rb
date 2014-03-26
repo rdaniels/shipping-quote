@@ -16,6 +16,10 @@ class FilterShipping
       return quotes
     else
 
+
+#binding.pry
+
+
       if ship_selected != nil && ship_selected == 'FedEx Ground'
         quotes.delete_if { |a| !a.to_s.match(/FedEx Ground/) }
       elsif ship_selected != nil
