@@ -14,7 +14,7 @@ class Quote
 
 
   def po_box(destination)
-    po_match = ['p.o','po box','p o box']
+    po_match = ['p.o','po box','p o box','p. o']
     street = destination[:street]
     street2 = destination[:street2]
     return true if street != nil && po_match.any? {|word| street.to_s.downcase.include?(word)}

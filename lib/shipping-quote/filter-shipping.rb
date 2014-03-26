@@ -9,16 +9,11 @@ class FilterShipping
 
   def filter_shipping(quotes, destination, ship_selected=nil)
     shown_rates = []
-    count_glass = pull_glass_count
 
-    if count_glass > 18 || @truck_only == 1
+    if @truck_only == 1
       quotes.delete_if { |a| !a.to_s.match(/Truck Shipping/) }
       return quotes
     else
-
-
-#binding.pry
-
 
       if ship_selected != nil && ship_selected == 'FedEx Ground'
         quotes.delete_if { |a| !a.to_s.match(/FedEx Ground/) }
@@ -69,15 +64,5 @@ class FilterShipping
     ormd_items.length
   end
 
-  def pull_glass_count
-    count_glass = 0
-    @cart_items.each do |item|
-      if item.isGlass == 1
-        multiplier = 2
-        multiplier = item.glassConverter.to_i if item.glassConverter != nil && item.glassConverter.to_i > 0
-        count_glass += (item.qty * multiplier)
-      end
-    end
-    count_glass
-  end
+
 end

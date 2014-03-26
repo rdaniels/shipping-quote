@@ -200,26 +200,59 @@ module ShippingQuote
       it 'returns quote' do
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'NY', 'city'=>'Baiting Hollow', 'postal_code'=>'11933', 'price_class'=>'1' }
         cart_items = [
-            {'qty'=>'1', 'ref01'=>'S161RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
-            {'qty'=>'1', 'ref01'=>'S152RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
-            {'qty'=>'1', 'ref01'=>'S111RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0'},
-            {'qty'=>'1', 'ref01'=>'S100RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
-            {'qty'=>'1', 'ref01'=>'S1009-MD', 'backorder'=>'0', 'glassConverter'=>'3', 'unit_weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0'},
-            {'qty'=>'1', 'ref01'=>'Y5002SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'unit_weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=> '0'},
-            {'qty'=>'1', 'ref01'=>'Y1100SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'unit_weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>' 0'}
+            {'qty'=>'1', 'ref01'=>'S161RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S152RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S111RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'weight'=>'', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S100RR-LG', 'backorder'=>'0', 'glassConverter'=>'3', 'weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'LRG', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'S1009-MD', 'backorder'=>'0', 'glassConverter'=>'3', 'weight'=>'0.00',  'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0'},
+            {'qty'=>'1', 'ref01'=>'Y5002SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=> '0'},
+            {'qty'=>'1', 'ref01'=>'Y1100SP-MD', 'backorder'=>'0', 'glassConverter'=>'2', 'weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>' 0'}
         ]
         c_hash = []
         cart_items.each {|item| c_hash << Hashit.new(item) }
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
+        expect(results.length).to be > 0
+      end
 
+      it 'high number of glass flips to truck_only' do
+        destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'NY', 'city'=>'Baiting Hollow', 'postal_code'=>'11933', 'price_class'=>'1' }
+        cart_items = [
+          { 'qty'=>'2', 'ref01'=>'X21071-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '1', 'weight'=>'', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0' },
+          { 'qty'=>'1', 'ref01'=>'X22672-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '1', 'weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0' },
+          { 'qty'=>'2', 'ref01'=>'X100-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '1', 'weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0' },
+          { 'qty'=>'1', 'ref01'=>'X20PK', 'backorder'=>'0', 'ormd'=>'0', 'glassConverter'=> '', 'weight'=>'10.00', 'isGlass'=>'0', 'shipCode'=>'UPS', 'fs'=>'0' },
+          { 'qty'=>'1', 'ref01'=>'X4027', 'backorder'=>'0', 'ormd'=>'0', 'glassConverter'=> '', 'weight'=>'6.00', 'isGlass'=>'0', 'shipCode'=>'GLA', 'fs'=>'0' },
+          { 'qty'=>'1', 'ref01'=>'XS56', 'backorder'=>'0', 'ormd'=>'0', 'glassConverter'=> '', 'weight'=>'0.38', 'isGlass'=>'0', 'shipCode'=>' NPA', 'fs'=>'0' },
+          { 'qty'=>'17', 'ref01'=>'M3906-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'1.05', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0' }
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
 
+        has_truck = results.select{|key, value| key.to_s.match(/^Truck Shipping/)}
+        expect(has_truck.length).to eq(1)
+      end
+
+      it 'po box does not return fedex'  do
+        destination = {'country'=>'US', 'street'=>'P. O. Box 5884', 'street2'=>'', 'province'=>'Az', 'city'=>'Glendale', 'postal_code'=>'85312', 'price_class'=>'1' }
+        cart_items = [
+          { 'qty'=>'2', 'ref01'=>'X21071-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '1', 'weight'=>'', 'isGlass'=>'1', 'shipCode'=>'', 'fs'=>'0' },
+          { 'qty'=>'1', 'ref01'=>'X22672-MD', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '1', 'weight'=>'0.00', 'isGlass'=>'1', 'shipCode'=>'UPS', 'fs'=>'0' }
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        has_fedex = results.select{|key, value| key.to_s.match(/^FedEx/)}
+        expect(has_fedex.length).to eq(0)
       end
 
     end
-
   end
 end
 

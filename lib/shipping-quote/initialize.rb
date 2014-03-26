@@ -52,8 +52,6 @@ module ShippingQuote
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 
-#binding.pry
-
       if quotes.length > 0 && filtered_quotes.length == 0
         @config[:shown_rates] = @config[:po_box_rates]
         filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
@@ -98,11 +96,25 @@ module ShippingQuote
         item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
         return 1 if shipCode == 'TRK'
       end
+
+      count_glass = 0
+      @cart_items.each do |item|
+        if item.isGlass.to_i == 1
+          isku = item.ref01.downcase
+          if isku.include?('-sm') || isku.include?('-md') || isku.include?('-lg')
+            count_glass += item.qty.to_i
+          else
+            multiplier = 2
+            multiplier = item.glassConverter.to_i if item.glassConverter.to_i > 0
+            count_glass += (item.qty.to_i * multiplier)
+          end
+        end
+      end
+      return 1 if count_glass > 18
+
       return 0
     end
   end
-
-
 end
 
 
