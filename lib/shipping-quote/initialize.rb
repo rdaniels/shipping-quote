@@ -123,7 +123,7 @@ module ShippingQuote
     ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd.to_i > 0 }
     @notes = '' if @notes == nil
     ormd_items.each do |item|
-      @notes += 'Item ' + item.ref01 + ' cannot ship air.'
+      @notes += 'Item ' + item.ref01.to_s + ' cannot ship air.'
     end
   end
   end
