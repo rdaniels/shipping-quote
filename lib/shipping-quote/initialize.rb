@@ -47,8 +47,10 @@ module ShippingQuote
       @boxing_charge = ship.boxing
       destination['province'] = 'VI' if destination['country'] == 'VI'
       destination['country'] = 'US' if destination['country'] == 'VI'
+
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)
+
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 
@@ -76,6 +78,7 @@ module ShippingQuote
           end
         end
       end
+      ormd_notes
       quote.multiplier(filtered_quotes)
     end
 
@@ -114,6 +117,15 @@ module ShippingQuote
 
       return 0
     end
+
+
+  def ormd_notes
+    ormd_items = @cart_items.find_all { |item| item.ormd != nil && item.ormd.to_i > 0 }
+    @notes = '' if @notes == nil
+    ormd_items.each do |item|
+      @notes += 'Item ' + item.ref01 + ' cannot ship air.'
+    end
+  end
   end
 end
 

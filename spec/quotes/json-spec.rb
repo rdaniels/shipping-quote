@@ -72,10 +72,6 @@ module ShippingQuote
       end
 
 
-
-
-
-
       it 'returns USPS options' do
         config[:us_carriers] << 'USPS'
         destination = {"country"=>'US', 'street'=>'po box 41246', 'street2'=>'', 'province'=>'TN', 'city'=>'NASHVILLE', 'postal_code'=>'37204' }
@@ -148,6 +144,7 @@ module ShippingQuote
         expect(results[0][1]).to eq(0)
       end
 
+
       it 'backorder=3 test - does not return a free ship option' do
         destination = {'country'=>'US', 'street'=>'9 RIDGE RD', 'street2'=>'', 'province'=>'VA', 'city'=>'HARTFIELD', 'postal_code'=>'23071-3130' }
         cart_items = [
@@ -193,9 +190,20 @@ module ShippingQuote
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
         expect(results.length).to be > 0
-
       end
 
+      it 'ormd items show in notes' do
+        destination = {'country'=>'CA', 'street'=>'', 'street2'=>'', 'province'=>'ON', 'city'=>'', 'postal_code'=>'N1R1C8', 'price_class'=>'1' }
+        cart_items = [
+            {'qty'=>'1', 'ref01'=>'2028', 'backorder'=>'0', 'glassConverter'=>'', 'weight'=>'0.6',  'isGlass'=>'0', 'ormd'=>'1', 'shipCode'=>'UPS', 'fs'=>'0'}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        expect(ship.notes.length).to be > 1
+      end
 
       it 'returns quote' do
         destination = {'country'=>'GU', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'GU', 'city'=>'Baiting Hollow', 'postal_code'=>'00918', 'price_class'=>'1' }
@@ -213,8 +221,8 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
-        #expect(results.length).to be > 0
+        #puts results
+        expect(results.length).to be > 0
       end
 
       it 'high number of glass flips to truck_only' do

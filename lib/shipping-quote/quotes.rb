@@ -1,3 +1,4 @@
+#require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
 require_relative 'carriers'
@@ -6,12 +7,10 @@ require_relative 'carriers'
 class Quote
   attr_accessor :notes
 
-
   def initialize(cart_items, config, truck_only=nil)
     @cart_items, @config, @truck_only = cart_items, config, truck_only
     @notes = []
   end
-
 
   def po_box(destination)
     po_match = ['p.o','po box','p o box','p. o']
@@ -21,7 +20,6 @@ class Quote
     return true if street2 != nil && po_match.any? {|word| street2.to_s.downcase.include?(word)}
     false
   end
-
 
   def quotes(destination, packages, ship_selected=nil)
     all_rates = []

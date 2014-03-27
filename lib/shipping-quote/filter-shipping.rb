@@ -38,6 +38,7 @@ class FilterShipping
       shown_rates.delete_if { |rate| rate[0][0..4] == 'FedEx' } if is_po_box == 1
 
       ormd = check_ormd
+      ormd_allowed = ['FedEx Ground','FedEx Ground Home Delivery']
       shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd > 0
       shown_rates
     end
