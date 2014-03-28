@@ -261,6 +261,24 @@ module ShippingQuote
         expect(has_fedex.length).to eq(0)
       end
 
+
+      it 'returns a reasonable quote'  do
+        destination = {'country'=>'CA', 'street'=>'', 'street2'=>'', 'province'=>'ON', 'city'=>'', 'postal_code'=>'L2J4E3', 'price_class'=>'1' }
+        cart_items = [
+           { 'qty'=>2, 'ref01'=>'63755-MD', 'backorder'=>'0', 'glassConverter'=>'1', 'weight'=>0.24, 'isGlass'=>'3', 'shipCode'=>'UPS', 'fs'=>'0' },
+           { 'qty'=>60, 'ref01'=>'5237DB', 'backorder'=>'0', 'glassConverter'=>'', 'weight'=>0.13, 'isGlass'=>'0', 'shipCode'=>'UPS', 'fs'=>'0' },
+           { 'qty'=>6, 'ref01'=>'MB332', 'backorder'=>'0', 'glassConverter'=>'', 'weight'=>0.31, 'isGlass'=>'', 'shipCode'=>'UPS', 'fs'=>'0' },
+           { 'qty'=>6, 'ref01'=>'MB331', 'backorder'=>'0','glassConverter'=>'', 'weight'=>0.19, 'isGlass'=>'', 'shipCode'=>'UPS', 'fs'=>'0' }
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts results
+      end
+
+
     end
   end
 end

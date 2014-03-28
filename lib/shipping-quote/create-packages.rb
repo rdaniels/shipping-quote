@@ -29,7 +29,7 @@ class CreatePackages
     free_shipping = FreeShipping.new(cart_items,@config)
     cart_items.each do |item|
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
-      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && (item.isGlass == nil || item.isGlass.to_i == 0 || item.isGlass == 2 || item.isGlass == 3)
+      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && ( item.isGlass.to_i == 0 || item.isGlass.to_i == 2 || item.isGlass.to_i == 3)
 
         if item.ref01.to_s[-4,4] != '-sht'  # dichro sheet added as large glass piece
           if item.weight == nil
@@ -44,6 +44,7 @@ class CreatePackages
           end
         end
       end
+
     end
 
     # regular items
@@ -69,7 +70,7 @@ class CreatePackages
         else
           lg_pieces += item.qty * 2
         end
-      elsif item.isGlass == 3 && !%w{-sm -md -lg}.include?(item.ref01[-3,3].to_s)
+      elsif item.isGlass.to_i == 3 && !%w{-sm -md -lg}.include?(item.ref01[-3,3].to_s.downcase)
         lg_pieces += 1
       end
     end
@@ -96,7 +97,7 @@ class CreatePackages
   def convert_small_to_large(glass_pieces)
     sm_pieces = glass_pieces[0]
     lg_pieces = glass_pieces[1]
-    if sm_pieces > 0 && lg_pieces > 0
+    if sm_pieces.to_i > 0 && lg_pieces.to_i > 0
       if sm_pieces + lg_pieces <= @config[:lg_box2_pieces]
         lg_pieces += sm_pieces
         sm_pieces = 0
@@ -156,7 +157,7 @@ class CreatePackages
   def dichro_packages(cart_items)
 
     dichro_pieces = 0
-    cart_items.each { |item| dichro_pieces += item.qty if item.isGlass == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
+    cart_items.each { |item| dichro_pieces += item.qty if item.isGlass.to_i == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
     dichro_boxes = (dichro_pieces.to_d / 6).ceil
     #if dichro_pieces > 0
     #  glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
