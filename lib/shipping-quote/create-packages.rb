@@ -1,4 +1,4 @@
-#require 'pry'
+require 'pry'
 require_relative 'filter-shipping'
 
 class CreatePackages
@@ -54,7 +54,6 @@ class CreatePackages
     add_packages(1, partial_item_box) if partial_item_box > 0
 
 
-
     # glass boxes
     sm_pieces = 0
     lg_pieces = 0
@@ -84,6 +83,7 @@ class CreatePackages
     lead_box = lead_packages(cart_items)
     dichro_boxes = dichro_packages(cart_items)
     #special_order
+
 
     @boxing += calculate_boxing(lead_box, add_small_glass_boxes, add_large_glass_boxes, dichro_boxes)
     @packages = [] if @notes != nil
@@ -157,7 +157,7 @@ class CreatePackages
   def dichro_packages(cart_items)
 
     dichro_pieces = 0
-    cart_items.each { |item| dichro_pieces += item.qty if item.isGlass.to_i == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
+    cart_items.each { |item| dichro_pieces += item.qty.to_i if item.isGlass.to_i == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
     dichro_boxes = (dichro_pieces.to_d / 6).ceil
     #if dichro_pieces > 0
     #  glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4
@@ -171,6 +171,8 @@ class CreatePackages
     boxing_charge = 0
     large_glass_boxes = 0 if large_glass_boxes == nil
     small_glass_boxes = 0 if small_glass_boxes == nil
+    dichro_boxes = 0 if dichro_boxes == nil
+    large_glass_boxes -= dichro_boxes if large_glass_boxes >= dichro_boxes && @config[:dichro_box_charge].to_d == 0
 
     if large_glass_boxes > 6 || @truck_only == 1
       boxing_charge = 0
