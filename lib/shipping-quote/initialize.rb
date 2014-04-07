@@ -9,13 +9,13 @@ module ShippingQuote
 
 
   class Shipping
-    attr_accessor :boxing_charge, :notes, :packages
+    attr_accessor :boxing_charge, :notes, :packages, :remarks
 
     def initialize(cart_items, config = nil)
+      @remarks = ''
       @cart_items = cart_items
       @cart_items = [] if cart_items == nil
       @config = config
-
       @config = YAML::load(IO.read("#{Rails.root}/config/shipping-quote.yml")) if @config == nil
 
       #begin
@@ -78,6 +78,11 @@ module ShippingQuote
         end
       end
       ormd_notes
+
+      packages.each_with_index { |p,i| @remarks += "Package #{i+1} weight: #{p.weight.to_f / 16} NEWLINE " }
+      @remarks += "Boxing: #{@boxing_charge} NEWLINE NEWLINE "
+      @cart_items.each_with_index { |p,i| @remarks += "Item#{i+1} ref01: #{p.ref01}, qty: #{p.qty}, weight: #{p.weight}, shipCode: #{p.shipCode}, isGlass: #{p.isGlass} NEWLINE " }
+
       quote.multiplier(filtered_quotes)
     end
 
