@@ -1,4 +1,3 @@
-#require 'pry'
 require 'active_shipping'
 include ActiveSupport::Cache
 include ActiveMerchant::Shipping
@@ -49,9 +48,6 @@ class PullCarriers
         @notes << 'USPS can not produce quotes at this time' # + error.response.message
       end
     end
-
-
-#binding.pry
 
     usps_rates
   end

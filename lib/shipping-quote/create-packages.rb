@@ -1,4 +1,3 @@
-#require 'pry'
 require_relative 'filter-shipping'
 
 class CreatePackages

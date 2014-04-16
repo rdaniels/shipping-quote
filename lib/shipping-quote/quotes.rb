@@ -1,4 +1,3 @@
-#require 'pry'
 require 'active_shipping'
 include ActiveMerchant::Shipping
 require_relative 'carriers'
@@ -72,17 +71,16 @@ class Quote
         rl_quote = (rl.freight_request(destination)).to_i if rl_quote == 0
         rl_quote = (rl.freight_request(destination)).to_i if rl_quote == 0
         all_rates += [['Truck Shipping', rl_quote*100 ]] if rl_quote != 0
+        @notes = rl.notes if rl.notes.to_s != ''
     end
 
     all_rates = [] if all_rates == nil
     all_rates
   end
 
+
   def multiplier(quotes)
     if @config[:rate_multiplier].to_d != 1 && quotes != nil && quotes.length > 0
-
-
-#binding.pry
 
       quotes.each do |q|
         if q[0][0..4] == 'FedEx' && q[0][0..7] != 'FedEx Gr'  && @config[:fedex_express_multiplier].to_d != 1

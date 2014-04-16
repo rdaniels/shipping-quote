@@ -1,5 +1,3 @@
-#require 'pry'
-
 class FilterShipping
   def initialize(cart_items, config, truck_only=nil)
     @cart_items, @config, @truck_only = cart_items, config, truck_only

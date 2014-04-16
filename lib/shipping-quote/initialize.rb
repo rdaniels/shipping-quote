@@ -1,5 +1,3 @@
-#require 'pry'
-
 module ShippingQuote
   require_relative 'quotes'
   require_relative 'filter-shipping'
@@ -50,6 +48,8 @@ module ShippingQuote
 
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)
+      @notes = quote.notes if quote.notes.to_s != '' && quote.notes != []
+
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
 

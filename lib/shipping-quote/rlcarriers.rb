@@ -29,7 +29,7 @@ class RLQuote
     my_hash = Hash.from_xml(res)
 
     if my_hash ['xml']['ratequote']['netcharges'] == nil
-      @notes == 'Truck Quote not available'
+      my_hash ['xml']['ratequote']['error'] == nil ? @notes ='Truck Quote not available' : @notes = my_hash ['xml']['ratequote']['error']
       0
     else
       my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
@@ -41,7 +41,6 @@ class RLQuote
     # rescue => error
     #   0
     # end
-
 
   end
 
@@ -74,7 +73,13 @@ class RLQuote
 
   def get_weight(sm_glass_pieces=0, lg_glass_pieces=0)
     weight = 0
-    @cart_items.each { |item| weight += item.weight.to_d * item.qty.to_i if item.weight != nil }
+    @cart_items.each do |item|
+      weight += item.weight.to_d * item.qty.to_i if item.weight != nil
+      sm_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.match(/-sm/)
+      sm_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.match(/-md/)
+      lg_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.match(/-lg/)
+      lg_glass_pieces += item.qty.to_i * 2 if item.isGlass.to_i == 1 && item.ref01.to_s.match(/-sht/)
+    end
     weight += sm_glass_pieces * 2
     weight += lg_glass_pieces * 5
     weight
