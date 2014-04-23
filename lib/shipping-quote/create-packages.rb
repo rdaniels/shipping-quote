@@ -173,7 +173,7 @@ class CreatePackages
     dichro_boxes = 0 if dichro_boxes == nil
     large_glass_boxes -= dichro_boxes if large_glass_boxes >= dichro_boxes && @config[:dichro_box_charge].to_d == 0
 
-    if large_glass_boxes > 6 || @truck_only == 1
+    if large_glass_boxes > 6 || @truck_only > 0
       boxing_charge = 0
 
     elsif @config[:add_boxing_charge] == true

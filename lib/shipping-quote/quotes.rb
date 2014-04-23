@@ -51,20 +51,20 @@ class Quote
     end
 
 
-    if country_key.include?('FedEx') && @truck_only.to_i == 0
+    if country_key.include?('FedEx') && @truck_only.to_i != 1
       fedex_rates = c.pull_fedex(origin, location_destination, packages)
       all_rates += fedex_rates
     end
-    if country_key.include?('USPS') && @truck_only.to_i == 0
+    if country_key.include?('USPS') && @truck_only.to_i != 1
       usps_rates = c.pull_usps(origin, location_destination, packages)
       all_rates += usps_rates
     end
-    if country_key.include?('UPS') && @truck_only.to_i == 0
+    if country_key.include?('UPS') && @truck_only.to_i != 1
       ups_rates = c.pull_ups(origin, location_destination, packages)
       all_rates += ups_rates
     end
 
-    if country_key.include?('RL') && @truck_only.to_i == 1
+    if country_key.include?('RL') && @truck_only.to_i > 0
         rl = RLQuote.new(@cart_items, @config)
         rl_quote = (rl.freight_request(destination)).to_i
         # retry

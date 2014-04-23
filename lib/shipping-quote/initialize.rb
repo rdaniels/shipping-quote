@@ -108,7 +108,8 @@ module ShippingQuote
       @cart_items.each do |item|
         if item.isGlass.to_i == 1
           isku = item.ref01.downcase
-          if isku.include?('-sm') || isku.include?('-md') || isku.include?('-lg')
+          if isku.include?('-sm') || isku.include?('-md') 
+          elsif isku.include?('-lg')
             count_glass += item.qty.to_i
           else
             multiplier = 2
@@ -117,7 +118,7 @@ module ShippingQuote
           end
         end
       end
-      return 1 if count_glass > 18
+      return 2 if count_glass > 30
 
       return 0
     end
