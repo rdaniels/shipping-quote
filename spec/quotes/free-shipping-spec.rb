@@ -95,6 +95,14 @@ module ShippingQuote
 
 
     describe 'comparison test' do
+      it 'returns lowest priced ship method' do
+        item.stub(:freeShipping).and_return(0)
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        expect(ship.lowest_priced).to eq('FedEx Ground')
+      end
+
       it 'quote with free ship items less than quote without' do
         cart_items[0] = item
         cart_items[1] = item2

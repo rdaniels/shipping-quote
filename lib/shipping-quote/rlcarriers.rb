@@ -50,7 +50,10 @@ class RLQuote
     x = 85 if kiln.length > 0
 
     large_sheet = @cart_items.find_all { |item| (item.ref01.to_s.downcase.match(/-lg/) || item.ref01.downcase.to_s.match(/-sht/)) && item.isGlass.to_i == 1 }
-    sum = large_sheet.map(&:qty).inject(0, &:+)
+    #sum = large_sheet.map(&:qty).inject(0, &:+)
+    sum = 0
+    large_sheet.each { |item| sum += item.qty.to_i }
+
     x = 65 if sum >= 30
 
     lead = @cart_items.find_all { |item| item.shipCode == 'LEA' }

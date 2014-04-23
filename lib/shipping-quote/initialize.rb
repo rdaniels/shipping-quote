@@ -7,7 +7,7 @@ module ShippingQuote
 
 
   class Shipping
-    attr_accessor :boxing_charge, :notes, :packages, :remarks
+    attr_accessor :boxing_charge, :notes, :packages, :remarks, :lowest_priced
 
     def initialize(cart_items, config = nil)
       @remarks = ''
@@ -41,14 +41,14 @@ module ShippingQuote
     def runner(destination, ship_selected=nil, allow_free_ship=true)
       ship = CreatePackages.new(@cart_items, @config, destination, truck_only)
       packages = ship.package_runner
-      @notes = ship.notes
+      @notes ||= ship.notes
       @boxing_charge = ship.boxing
       destination['province'] = 'VI' if destination['country'] == 'VI'
       destination['country'] = 'US' if destination['country'] == 'VI'
 
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)
-      @notes = quote.notes if quote.notes.to_s != '' && quote.notes != []
+      @notes ||= quote.notes if quote.notes.to_s != '' && quote.notes != []
 
       filter = FilterShipping.new(@cart_items,@config, truck_only)
       filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
@@ -57,22 +57,22 @@ module ShippingQuote
         @config[:shown_rates] = @config[:po_box_rates]
         filtered_quotes = filter.filter_shipping(quotes, destination, ship_selected)
       end
+      @lowest_priced = FreeShipping.lowest_priced(filtered_quotes)[0] if filtered_quotes != []
 
       # free shipping
       if allow_free_ship == true && allow_price_class(destination) == true
         free_shipping = FreeShipping.new(@cart_items,@config)
         if truck_only == 0 && free_shipping.validate_location(destination) == true && filtered_quotes != []
-          lowest_priced = FreeShipping.lowest_priced(filtered_quotes)[0]
           ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
           ship_free.package_runner(1)
           packages_free_removed = ship_free.packages
 
           if packages_free_removed.map{|p| p.weight}.sum != packages.map{|p| p.weight}.sum
             if packages_free_removed == nil || packages_free_removed.length == 0
-              filtered_quotes = free_shipping.update_quote(filtered_quotes, 0, lowest_priced)
+              filtered_quotes = free_shipping.update_quote(filtered_quotes, 0, @lowest_priced)
             else
-              quotes_free_removed = quote.quotes(destination, packages_free_removed, lowest_priced)
-              filtered_quotes = free_shipping.update_quote(filtered_quotes, quotes_free_removed[0][1], lowest_priced)
+              quotes_free_removed = quote.quotes(destination, packages_free_removed, @lowest_priced)
+              filtered_quotes = free_shipping.update_quote(filtered_quotes, quotes_free_removed[0][1], @lowest_priced)
             end
           end
         end
