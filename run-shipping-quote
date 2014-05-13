@@ -7,15 +7,15 @@ config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
 cart_items = []
 class StubItem
  #def shipCode; 'UPS';   end
-  def isGlass; 1;  end
+  def isGlass; 0;  end
   def qty;  1;  end
-  def weight; 5;  end
-  def backorder; 28;  end
+  def weight; 1;  end
+  def backorder; nil;  end
   #def vendor; nil;  end
   def ormd; nil; end
   def name; 'Kokomo Medium Amber, Lime Green, Opal'; end;
-  def ref01; 'K13'; end
-  def glassConverter; 4; end
+  def ref01; '17140'; end
+  def glassConverter; 0; end
 end
 class StubItem2
   #def shipCode; 'LEA';   end
@@ -35,7 +35,7 @@ class StubCustomer
   def country; 'US'; end
   def city; 'Tampa'; end
   def state; 'FL' end
-  def zip; '33609'; end
+  def zip; '61364'; end
 end
 
 
@@ -54,11 +54,11 @@ item2 = StubItem2.new
 c = StubCustomer.new
 
 cart_items[0] = item
-cart_items[1] = item2
+# cart_items[1] = item2
 #item2 = StubItem2.new
 #cart_items[2] = item2
 
-destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal_code => '48910'}
+destination = { :country => 'US', :province => 'MI', :city => 'Lansing', :postal_code => '61364'}
 #destination = { :country => 'US', :province => 'FL', :city => 'Tampa', :postal_code => '33609'}
 #destination = { :country => 'US', :province => 'AP', :city => 'Tampa', :postal_code => '96319'}
 #destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}

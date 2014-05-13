@@ -59,6 +59,7 @@ module ShippingQuote
       end
       @lowest_priced = FreeShipping.lowest_priced(filtered_quotes)[0] if filtered_quotes != []
 
+
       # free shipping
       if allow_free_ship == true && allow_price_class(destination) == true
         free_shipping = FreeShipping.new(@cart_items,@config)
