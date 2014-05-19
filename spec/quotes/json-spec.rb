@@ -193,22 +193,6 @@ module ShippingQuote
         expect(has_truck.length).to eq(1)
       end
 
-      it 'free shipping on large glass' do
-        destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'MI', 'city'=>'Charlevoix', 'postal_code'=>'49720-1101', 'price_class'=>'1' }
-        
-        cart_items = [
-          { 'qty'=>'20', 'ref01'=>'S100SDY-LG', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'0', 'isGlass'=>'1', 'shipCode'=>'LRG', 'freeShipping'=>'1' }
-        ]
-        c_hash = []
-        cart_items.each {|item| c_hash << Hashit.new(item) }
-        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-        ship = Shipping.new(c_hash, config)
-        results = ship.runner(d_symbol)
-
-        has_fedex = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
-        expect(has_fedex[0][1]).to eq(0)
-      end
-
       it 'returns quote' do
         destination = {'country'=>'US', 'street'=>'6850 S ROLLING HILLS DR', 'street2'=>'', 'province'=>'MI', 'city'=>'TRAVERSE CITY', 'postal_code'=>'49684-6505', 'price_class'=>'4' }
         cart_items = [

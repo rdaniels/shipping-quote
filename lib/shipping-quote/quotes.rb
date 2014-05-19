@@ -26,6 +26,7 @@ class Quote
     origin = Location.new(@config[:origin])
     destination[:country] = 'US' if ['United States','USA'].include? destination[:country]
     destination[:country] = 'CA' if ['Canada'].include? destination[:country]
+    destination[:province] = '' if destination[:province].downcase == 'international'
     location_destination = Location.new(destination)
 
     country_key = %w(USPS FedEx)

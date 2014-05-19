@@ -60,7 +60,7 @@ module ShippingQuote
         expect(has_usps.length).to be > 0
       end
 
-      it 'returns USPS quote for CA' do
+      it 'returns USPS & UPS quote for CA' do
         destination[:country] = 'CA'
         destination[:postal_code] = 'V8L 5N6'
         destination[:province] = 'International'
@@ -74,6 +74,7 @@ module ShippingQuote
         ship = Shipping.new(cart_items, config)
         results = ship.runner(destination)
         has_usps = results.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
+        has_ups = results.select{|key, value| key.to_s.match(/^UPS Standard/)}
         expect(has_usps.length).to be > 0
       end
     end

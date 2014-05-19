@@ -68,6 +68,7 @@ class PullCarriers
         @notes << 'UPS can not produce quotes at this time' # + error.response.message
       end
     end
+
     ups_rates
   end
 
