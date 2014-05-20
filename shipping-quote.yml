@@ -48,6 +48,7 @@
 :usps:
   :login: 'YourUSPSLogin'
 :ups:
+    :account: '123456'  # leave blank for published rate
     :login: 'UPS-Login'
     :password: 'UPS-password'
     :key: 'API-key'

@@ -59,16 +59,17 @@ class PullCarriers
     ups_rates = @cache.read(cache_name)
     if ups_rates == nil || ups_rates == []
       begin
-        ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key])
+        ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
         response = ups.find_rates(origin, location_destination, packages)
-        ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
+        ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.negotiated_rate == 0 ? rate.price : rate.negotiated_rate] } #rate.price
+
         @cache.write(cache_name, ups_rates, :expires_in => 24.hours)
       rescue #=> error
         ups_rates = []
         @notes << 'UPS can not produce quotes at this time' # + error.response.message
       end
     end
-
+   
     ups_rates
   end
 
