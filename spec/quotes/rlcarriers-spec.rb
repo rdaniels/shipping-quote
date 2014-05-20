@@ -1,5 +1,16 @@
 require 'spec_helper'
-# require 'pry'
+
+
+class Hashit
+  def initialize(hash)
+    hash.each do |k,v|
+      self.instance_variable_set("@#{k}", v)  ## create and initialize an instance variable for this key/value pair
+      self.class.send(:define_method, k, proc{self.instance_variable_get("@#{k}")})  ## create the getter that returns the instance variable
+      self.class.send(:define_method, "#{k}=", proc{|v| self.instance_variable_set("@#{k}", v)})  ## create the setter that sets the instance variable
+    end
+  end
+end
+
 
 module ShippingQuote
   describe Shipping do
@@ -47,6 +58,17 @@ module ShippingQuote
 
         ship = RLQuote.new(cart_items, config)
         expect(ship.get_weight).to eq(60)
+      end
+
+      it 'truck handle ref01 as fixnum' do
+        cart_items = [
+          {"shipCode"=>"TRK", "glassConverter"=>"", "weight"=>50, "qty"=>1, "ref01"=>3000, "backorder"=>0, "ormd"=>"", "freeShipping"=>0, "isGlass"=>""}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }        
+        ship = RLQuote.new(c_hash, config)
+        quote = ship.freight_request(destination)
+        expect(quote).to be > 20
       end
 
       it 'Runner returns only Truck Shipping over $40 if shipCode = TRK' do

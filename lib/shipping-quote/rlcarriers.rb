@@ -46,10 +46,17 @@ class RLQuote
 
   def ship_class
     x = 70
-    kiln = @cart_items.find_all { |item| item.name != nil && item.name.match(/kiln/) && item.weight > 15 }
+    kiln = @cart_items.find_all do |item|
+      if item.respond_to? :name 
+        item.name != nil && item.name.match(/kiln/) && item.weight > 15 
+      end
+    end
     x = 85 if kiln.length > 0
 
-    large_sheet = @cart_items.find_all { |item| (item.ref01.to_s.downcase.match(/-lg/) || item.ref01.downcase.to_s.match(/-sht/)) && item.isGlass.to_s.to_i == 1 }
+    large_sheet = @cart_items.find_all do |item|
+      ref01 = item.ref01.to_s
+     (ref01.downcase.match(/-lg/) || ref01.downcase.match(/-sht/)) && item.isGlass.to_s.to_i == 1 
+    end
     #sum = large_sheet.map(&:qty).inject(0, &:+)
     sum = 0
     large_sheet.each { |item| sum += item.qty.to_i }
