@@ -34,10 +34,11 @@ class FilterShipping
       is_po_box = 1 if destination[:street2] != nil && ['p.o', 'po box', 'p o box'].any? { |w| destination[:street2].to_s.downcase =~ /#{w}/ }
 
       shown_rates.delete_if { |rate| rate[0][0..4] == 'FedEx' } if is_po_box == 1
-
       ormd = check_ormd
+
       ormd_allowed = ['FedEx Ground','FedEx Ground Home Delivery']
-      shown_rates = shown_rates.delete_if { |rate| rate[0] != 'FedEx Ground' && rate[0] != 'FedEx Ground Home Delivery' } if ormd > 0
+      ormd_allowed = [] if ['AK','HI','PR','VI'].include? destination[:province]
+      shown_rates = shown_rates.delete_if { |rate| !ormd_allowed.include? rate[0] } if ormd > 0
       shown_rates
     end
   end

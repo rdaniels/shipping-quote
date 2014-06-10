@@ -17,11 +17,45 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: 1, glassConverter: nil) }
     let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
-    let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
+    let!(:destination) { {:country => 'AU',:street => '1234 fake street', :province => 'Victoria', :city => 'Wandiligong', :postal_code => '3744'} }
 
     describe 'ORMD tests' do
+
+      it 'blocks ormd to australia' do
+        cart_items[0] = item
+        cart_items[1] = item2
+        ship = Shipping.new(cart_items, config)
+        results = ship.runner(destination)
+        expect(results.length).to eq(0)
+      end
+
+      it 'allows ormd to florida' do
+        config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
+        destination[:country] = 'US'
+        destination[:postal_code] = '33609'
+        destination[:province] = 'FL'
+        destination[:city] = 'Tampa'
+        cart_items[0] = item
+        cart_items[1] = item2
+        ship = Shipping.new(cart_items, config)
+        results = ship.runner(destination)
+        expect(results.length).to be > 0
+      end
+
+      it 'blocks ormd to alaska' do
+        config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
+        destination[:country] = 'US'
+        destination[:postal_code] = '99518'
+        destination[:province] = 'AK'
+        destination[:city] = 'Anchorage'
+        ship = Shipping.new(cart_items, config)
+        results = ship.runner(destination)
+        expect(results.length).to eq(0)
+      end
+
+
       it 'returns a reasonable quote'  do
         destination = {'country' => "US", 'price_class' => "1", 'province' => "MD", 'postal_code' => "20634" }
         # {'country'=>'CA', 'street'=>'', 'street2'=>'', 'province'=>'ON', 'city'=>'', 'postal_code'=>'L2J4E3', 'price_class'=>'1' }
