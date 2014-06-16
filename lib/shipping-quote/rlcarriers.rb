@@ -20,19 +20,25 @@ class RLQuote
       "origin" => "48910",
       "dest" => destination[:postal_code],
       "class1" => ship_class,
-      "weight1" => get_weight,
+      "weight1" => get_weight.to_f,
       "delnotify" => 'X',
       "hazmat" => check_ormd,
       "resdel" => residential
     }
-    res = http_get("www.rlcarriers.com", path, params)
-    my_hash = Hash.from_xml(res)
 
-    if my_hash ['xml']['ratequote']['netcharges'] == nil
-      my_hash ['xml']['ratequote']['error'] == nil ? @notes ='Truck Quote not available' : @notes = my_hash ['xml']['ratequote']['error']
-      0
-    else
-      my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
+    begin
+      res = http_get("www.rlcarriers.com", path, params)
+      my_hash = Hash.from_xml(res)
+
+      if my_hash ['xml']['ratequote']['netcharges'] == nil
+        my_hash ['xml']['ratequote']['error'] == nil ? @notes ='Truck Quote not available' : @notes = my_hash ['xml']['ratequote']['error']
+        0
+      else
+        my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
+      end
+    rescue
+        @notes ='Truck Quote not available'
+        0
     end
     # begin
     #   res = http_get("www.rlcarriers.com", path, params)

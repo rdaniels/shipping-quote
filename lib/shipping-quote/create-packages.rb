@@ -163,7 +163,7 @@ class CreatePackages
   def dichro_packages(cart_items)
 
     dichro_pieces = 0
-    cart_items.each { |item| dichro_pieces += item.qty.to_i if item.isGlass.to_i == 3 && item.ref01[-4,4].to_s.downcase != '-sht' }
+    cart_items.each { |item| dichro_pieces += item.qty.to_i if item.isGlass.to_i == 3 && item.ref01[-3,3].to_s.downcase == '-lg' }
     dichro_boxes = (dichro_pieces.to_d / 6).ceil
     #if dichro_pieces > 0
     #  glass_box_weight = ((dichro_pieces * 3) / dichro_boxes) + 4

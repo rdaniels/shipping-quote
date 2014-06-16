@@ -51,6 +51,26 @@ module ShippingQuote
        expect(ship.boxing).to eq(config[:lg_glass_box_charge].to_d + config[:lg_glass_box_charge].to_d + config[:first_glass_box_extra_charge].to_d)
      end
 
+     it 'does not add dichro box charge for -md' do
+        item.stub(:backorder).and_return(0)
+        item.stub(:isGlass).and_return(3)
+        item.stub(:ref01).and_return('s100rr-md')
+        cart_items[0] = item
+        ship = CreatePackages.new(cart_items, config, destination)
+        ship.package_runner
+        expect(ship.boxing).to eq(0)
+     end
+
+     it 'adds dichro box charge for -lg' do
+        item.stub(:backorder).and_return(0)
+        item.stub(:isGlass).and_return(3)
+        item.stub(:ref01).and_return('s100rr-lg')
+        cart_items[0] = item
+        ship = CreatePackages.new(cart_items, config, destination)
+        ship.package_runner
+        expect(ship.boxing).to eq(config[:dichro_box_charge].to_d)
+     end
+
     end
 
     #describe 'extra charges' do
