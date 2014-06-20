@@ -18,7 +18,7 @@ class RLQuote
     path = '/b2brateparam.asp'
     params = {"id" => "5173944631",
       "origin" => "48910",
-      "dest" => destination[:postal_code],
+      "dest" => destination[:postal_code].split('-').first,
       "class1" => ship_class,
       "weight1" => get_weight.to_f,
       "delnotify" => 'X',
