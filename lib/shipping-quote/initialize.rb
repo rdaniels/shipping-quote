@@ -4,7 +4,11 @@ module ShippingQuote
   require_relative 'create-packages'
   require_relative 'free-shipping'
   require_relative 'rlcarriers'
+  require 'geographer'
 
+  class States
+    include Geographer::Us::States
+  end
 
   class Shipping
     attr_accessor :boxing_charge, :notes, :packages, :remarks, :lowest_priced
@@ -45,6 +49,14 @@ module ShippingQuote
       @boxing_charge = ship.boxing
       destination['province'] = 'VI' if destination['country'] == 'VI'
       destination['country'] = 'US' if destination['country'] == 'VI'
+
+      if destination['country'] == 'US' && destination['province'].length > 2
+        destination['province'] =  States.names_abbreviation_map[destination['province'].titleize]
+      end
+
+      if destination[:country] == 'US' && destination[:province].length > 2
+        destination[:province] =  States.names_abbreviation_map[destination[:province].titleize]
+      end
 
       quote = Quote.new(@cart_items, @config, truck_only)
       quotes = quote.quotes(destination, packages, ship_selected)

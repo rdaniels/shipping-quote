@@ -47,14 +47,23 @@ module ShippingQuote
        expect(has_ground.length).to be > 0
        expect(has_usps.length).to eq(0)
      end
-
-
      it 'returns multiple quotes for Canada' do
        destination = { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}
        cart_items[0] = item
        ship = Shipping.new(cart_items, config)
        results = ship.runner(destination)
        expect(results.length).to be > 1
+     end
+
+
+      it 'returns fedex when state spelled out' do
+       destination = { :country => 'US', :province => 'GEORGIA', :city => 'Atlanta', :postal_code => '30306'}
+       item.stub(:weight).and_return('28')
+       cart_items[0] = item
+       ship = Shipping.new(cart_items, config)
+       results = ship.runner(destination)
+       has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+       expect(has_ground.length).to be > 0
      end
     end
 
