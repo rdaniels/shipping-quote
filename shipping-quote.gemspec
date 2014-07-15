@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'shipping-quote'
-  spec.version       = '0.1.48'
+  spec.version       = '0.1.49'
   spec.date          = '2013-12-11'
   spec.authors       = ['Rob Daniels']
   spec.email         = %w(rob@danielscorporation.com)
@@ -24,7 +24,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'geographer'
   #spec.add_dependency 'atomic_mem_cache_store'
 
-  spec.add_development_dependency 'rspec-core', '3.0.0.beta2'
+  spec.add_development_dependency 'rspec-core'
+  spec.add_development_dependency 'rspec-mocks'
+  spec.add_development_dependency 'rspec-expectations'
   spec.add_development_dependency 'pry-plus'
   #spec.add_development_dependency 'faker'
 end

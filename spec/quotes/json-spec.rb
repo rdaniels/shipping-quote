@@ -32,15 +32,6 @@ module ShippingQuote
       d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
 
 
-      it 'dtech crafts kraftyblock' do
-        cart_items = [{ "id"=> 4114, "cartID"=> 1046241, "custID"=> 137, "item"=> 193616, "ref01"=> "GBLOCKS101", "name"=> "KraftyBlok Original", "qty"=> 101, "isGlass"=> nil, "breakGroup"=> "193616", "breakGroupTotal"=> 101, "backorder"=> 1, "status"=> nil, "couponCode"=> nil}]
-        destination = { "id"=> 137, "peach_id"=> "136", "company"=> "Robert Corp.", "name_first"=> "Robert", "name_last"=> "Daniels", "phone"=> "8132654014", "fax"=> "", "street"=> "1234 Fake St N", "street2"=> "", "city"=> "Tampa", "state"=> "FL","province"=> "FL", "zip"=> "33618", "country"=> "United States", "email"=> "rob@danielscorporation.com", "price_mode"=> 2, "username"=> "testing", "password"=> "test", "hint"=> "", "tax_id"=> "123456789",  "business_type"=> "10B", "how_did_you_hear"=> "other", "open_account"=> 1, "status"=> "", "start_date"=> nil, "signature"=> "Robert Daniels", "welcome_email"=> nil, "comments"=> "", "term"=> 1}
-        cart_items.each {|item| c_hash << Hashit.new(item) }
-        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
-        ship = Shipping.new(c_hash, config)
-        results = ship.runner(d_symbol)
-        puts results
-      end
 
 
       it 'returns FedEx express saver and home ground' do
@@ -105,6 +96,16 @@ module ShippingQuote
         expect(results.length).to be > 0
       end
 
+
+      it 'dtech crafts kraftyblock' do
+        cart_items = [{ "id"=> 4114, "cartID"=> 1046241, "custID"=> 137, "item"=> 193616, "ref01"=> "GBLOCKS101", "name"=> "KraftyBlok Original", "qty"=> 101, "isGlass"=> nil, "breakGroup"=> "193616", "breakGroupTotal"=> 101, "backorder"=> 1, "status"=> nil, "couponCode"=> nil}]
+        destination = { "id"=> 137, "peach_id"=> "136", "company"=> "Robert Corp.", "name_first"=> "Robert", "name_last"=> "Daniels", "phone"=> "8132654014", "fax"=> "", "street"=> "1234 Fake St N", "street2"=> "", "city"=> "Tampa", "state"=> "FL","province"=> "FL", "zip"=> "33618", "country"=> "United States", "email"=> "rob@danielscorporation.com", "price_mode"=> 2, "username"=> "testing", "password"=> "test", "hint"=> "", "tax_id"=> "123456789",  "business_type"=> "10B", "how_did_you_hear"=> "other", "open_account"=> 1, "status"=> "", "start_date"=> nil, "signature"=> "Robert Daniels", "welcome_email"=> nil, "comments"=> "", "term"=> 1}
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts results
+      end
 
       it 'gift card check' do
         cart_items = [

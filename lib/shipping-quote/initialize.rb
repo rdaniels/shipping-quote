@@ -73,10 +73,10 @@ module ShippingQuote
 
 
       # free shipping
-      if allow_free_ship == true && allow_price_class(destination) == true
+      if allow_price_class(destination) == true
         free_shipping = FreeShipping.new(@cart_items,@config)
         if truck_only == 0 && free_shipping.validate_location(destination) == true && filtered_quotes != []
-          ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only)
+          ship_free = CreatePackages.new(@cart_items, @config, destination, truck_only, allow_free_ship)
           ship_free.package_runner(1)
           packages_free_removed = ship_free.packages
 

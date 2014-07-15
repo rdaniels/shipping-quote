@@ -3,11 +3,12 @@ require_relative 'filter-shipping'
 class CreatePackages
   attr_accessor :boxing, :notes, :packages, :stock_items, :special_order_items
 
-  def initialize(cart_items, config, destination, truck_only=0)
+  def initialize(cart_items, config, destination, truck_only=0, allow_free_ship=true)
     @cart_items, @config, @destination, @truck_only = cart_items, config, destination, truck_only
     @cart_items = [] if @cart_items == nil
     @packages = []
     @boxing = 0
+    @allow_free_ship = allow_free_ship
   end
 
 
@@ -28,7 +29,7 @@ class CreatePackages
     free_shipping = FreeShipping.new(cart_items,@config)
     cart_items.each do |item|
       item.shipCode == nil ? shipCode = '' : shipCode = item.shipCode.upcase
-      if (free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0) && ( item.isGlass.to_i == 0 || item.isGlass.to_i == 2 || item.isGlass.to_i == 3)
+      if (free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0) && ( item.isGlass.to_i == 0 || item.isGlass.to_i == 2 || item.isGlass.to_i == 3)
         if item.ref01.to_s[-4,4] != '-sht'  # dichro sheet added as large glass piece
           if item.weight == nil
             @notes = "Item #{item.ref01.to_s} is missing weight."
@@ -61,22 +62,22 @@ class CreatePackages
       if item.isGlass.to_i == 1
         if item.ref01[-3,3].to_s.downcase == '-sm' || item.ref01[-3,3].to_s.downcase == '-md'
           sm_pieces += item.qty.to_i
-          free_ship_sm += item.qty.to_i if free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+          free_ship_sm += item.qty.to_i if free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
         elsif item.ref01[-3,3].to_s.downcase == '-lg'
           lg_pieces += item.qty.to_i
-          free_ship_lg += item.qty.to_i if free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+          free_ship_lg += item.qty.to_i if free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
         elsif defined? item.glassConverter
           lg_pieces += item.qty.to_i * 2 if item.glassConverter.to_i == 0
-          free_ship_lg += item.qty.to_i * 2 if item.glassConverter.to_i == 0 && free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+          free_ship_lg += item.qty.to_i * 2 if item.glassConverter.to_i == 0 && free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
           lg_pieces += item.qty.to_i * item.glassConverter.to_i if item.glassConverter.to_i > 0
-          free_ship_lg += item.qty.to_i * item.glassConverter.to_i if item.glassConverter.to_i > 0 && free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+          free_ship_lg += item.qty.to_i * item.glassConverter.to_i if item.glassConverter.to_i > 0 && free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
         else
           lg_pieces += item.qty * 2
-          free_ship_lg += item.qty.to_i * 2 if free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+          free_ship_lg += item.qty.to_i * 2 if free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
         end
       elsif item.isGlass.to_i == 3 && !%w{-sm -md -lg}.include?(item.ref01[-3,3].to_s.downcase)
         lg_pieces += 1
-        free_ship_lg += 1 if free_shipping.free_ship_ok(item.freeShipping, @destination) == false || free_shipping_run == 0
+        free_ship_lg += 1 if free_shipping.free_ship_ok(item.freeShipping, @destination, @allow_free_ship) == false || free_shipping_run == 0
       end
     end
 

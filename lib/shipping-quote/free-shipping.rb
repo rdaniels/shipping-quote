@@ -11,8 +11,9 @@ class FreeShipping
   end
 
 
-  def free_ship_ok(free_ship, destination)
+  def free_ship_ok(free_ship, destination, allow_free_ship=true)
     return false if free_ship.to_i == 0
+    return false if free_ship.to_i == 1 && allow_free_ship == false
     return false if validate_location(destination) == false
     return false if validate_date == false && free_ship.to_i == 1
     return true if validate_date == true && free_ship.to_i == 1
@@ -51,8 +52,9 @@ class FreeShipping
 
   def validate_location(destination)
     pass = true
-    pass = false if destination[:country] != 'US'
+    pass = false if !@config[:free_shipping][:free_ship_countries].include? destination[:country]
     pass = false if %w[AP AE AK HI PR VI].include? destination[:province]
+    pass = false if %w[YT NT NU NL PE NS].include? destination[:province] #canada
     pass
   end
 
