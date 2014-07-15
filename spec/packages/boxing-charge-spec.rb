@@ -32,6 +32,16 @@ module ShippingQuote
         expect(ship.boxing).to eq(config[:lg_glass_box_charge].to_d + config[:first_glass_box_extra_charge].to_d)
       end
 
+      it '6 md and 12 lg goes in 2 large boxes' do
+        item.stub(:qty).and_return('6')
+        item2.stub(:qty).and_return('12')
+        cart_items[0] = item
+        cart_items[1] = item2
+        ship = CreatePackages.new(cart_items, config, destination)
+        ship.create_packages(cart_items)
+        expect(ship.boxing).to eq((config[:lg_glass_box_charge].to_d * 2)+ config[:first_glass_box_extra_charge].to_d)
+      end
+
       it 'adds 1 small and 1 large box from a small and large with too high qty to merge' do
         item.stub(:qty).and_return(config[:lg_box2_pieces])
         cart_items[0] = item

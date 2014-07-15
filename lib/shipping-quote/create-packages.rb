@@ -98,21 +98,23 @@ class CreatePackages
   end
 
 
-
-
-
   def convert_small_to_large(glass_pieces)
     sm_pieces = glass_pieces[0]
     lg_pieces = glass_pieces[1]
+
     if sm_pieces.to_i > 0 && lg_pieces.to_i > 0
       if sm_pieces + lg_pieces <= @config[:lg_box2_pieces]
+        lg_pieces += sm_pieces
+        sm_pieces = 0
+
+      # 6 md + 12 lg should go into 2 large boxes
+      elsif (sm_pieces + lg_pieces <= @config[:lg_box2_pieces] * 2) && lg_pieces > @config[:lg_box2_pieces]
         lg_pieces += sm_pieces
         sm_pieces = 0
       end
     end
     [sm_pieces,lg_pieces]
   end
-
 
 
   def small_glass_packages(glass_pieces)
