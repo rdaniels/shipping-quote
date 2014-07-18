@@ -11,7 +11,7 @@ module ShippingQuote
   end
 
   class Shipping
-    attr_accessor :boxing_charge, :notes, :packages, :remarks, :lowest_priced
+    attr_accessor :boxing_charge, :notes, :packages, :remarks, :lowest_priced, :cart_items
 
     def initialize(cart_items, config = nil)
       @remarks = ''
@@ -38,6 +38,9 @@ module ShippingQuote
           item.define_singleton_method(:ormd) { nil } if !defined? item.ormd
           item.define_singleton_method(:glassConverter) { nil } if !defined? item.glassConverter
           item.define_singleton_method(:freeShipping) { nil } if !defined? item.freeShipping
+          item.define_singleton_method(:length) { 5 } if !defined? item.length
+          item.define_singleton_method(:width) { 5 } if !defined? item.width
+          item.define_singleton_method(:height) { 5 } if !defined? item.height
       end
     end
 

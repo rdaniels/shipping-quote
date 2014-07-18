@@ -22,7 +22,7 @@ class PullCarriers
         fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password], key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
         response = fedex.find_rates(origin, location_destination, packages)
         fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-        @cache.write(cache_name, fedex_rates, :expires_in => 24.hours)
+        @cache.write(cache_name, fedex_rates, :expires_in => 48.hours)
       rescue #=> error
         #raise error
         fedex_rates = []
@@ -42,7 +42,7 @@ class PullCarriers
         usps = USPS.new(login: @config[:usps][:login])
         response = usps.find_rates(origin, location_destination, packages)
         usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price] }
-        @cache.write(cache_name, usps_rates, :expires_in => 24.hours)
+        @cache.write(cache_name, usps_rates, :expires_in => 72.hours)
       rescue #=> error
         usps_rates = []
         @notes << 'USPS can not produce quotes at this time' # + error.response.message
@@ -63,7 +63,7 @@ class PullCarriers
         response = ups.find_rates(origin, location_destination, packages)
         ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.negotiated_rate == 0 ? rate.price : rate.negotiated_rate] } #rate.price
 
-        @cache.write(cache_name, ups_rates, :expires_in => 24.hours)
+        @cache.write(cache_name, ups_rates, :expires_in => 48.hours)
       rescue #=> error
         ups_rates = []
         @notes << 'UPS can not produce quotes at this time' # + error.response.message

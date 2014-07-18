@@ -24,6 +24,18 @@ module ShippingQuote
     #let!(:destination) { { :country => 'CA', :province => 'ON', :city => 'Mississauga', :postal_code => 'L5B2T4'}  }
 
     describe 'sometimes free ship items' do
+
+      it 'tests lowest prices to AK' do
+        destination = {'country'=>'US', 'street'=>'36540 spruce circle rd', 'street2'=>'', 'province'=>'AK', 'city'=>'anchor point', 'postal_code'=>'99556', 'price_class'=>'1' }
+        cart_items = [{ 'qty'=>'1', 'ref01'=>'XSM96', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '', 'weight'=>'0.19', 'isGlass'=>'', 'shipCode'=>'NPA', 'freeShipping'=>'0' } ]
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, @config)
+        quote = ship.runner(d_symbol)
+        expect(ship.lowest_priced).to eq('USPS Priority Mail')
+      end
       
       it 'free shipping on glass triggered truck' do
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'MI', 'city'=>'Charlevoix', 'postal_code'=>'49720-1101', 'price_class'=>'1' }

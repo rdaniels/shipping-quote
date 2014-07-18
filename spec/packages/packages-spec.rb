@@ -92,8 +92,11 @@ module ShippingQuote
       it 'SHA item returns 1 package' do
         item.stub(:shipCode).and_return('SHA')
         cart_items[0] = item
-        ship = CreatePackages.new(cart_items, config, destination)
-        expect(ship.create_packages(cart_items).length).to eq(1)
+        ship = Shipping.new(cart_items, config)
+        packages = CreatePackages.new(ship.cart_items, config, destination)
+        my_box = packages.create_packages(ship.cart_items)
+        expect(my_box.length).to eq(1)
+        expect(my_box[0].inches).to eq([5,5,5])
       end
       it 'returns missing item weight in note and no packages' do
         item.stub(:weight).and_return(nil)

@@ -36,7 +36,7 @@ class CreatePackages
             break
           else
             if shipCode == 'SHA' || shipCode == 'TRK' || (item.weight.to_d > @config[:box_max_weight].to_d && (shipCode == 'UPS' || shipCode == ''))
-              add_packages(item.qty.to_i, item.weight.to_d)
+              add_packages(item.qty.to_i, item.weight.to_d, item.length, item.width, item.height)
             elsif shipCode != 'LEA'
               regular_item_weight += item.weight.to_d * item.qty.to_i
             end
@@ -205,8 +205,8 @@ class CreatePackages
     boxing_charge
   end
 
-  def add_packages(qty, weight)
-    (1..qty).each { @packages << Package.new((weight * 16), [5, 5, 5], :units => :imperial) }
+  def add_packages(qty, weight, length=5, width=5, height=5)
+    (1..qty).each { @packages << Package.new((weight * 16), [length, width, height], :units => :imperial) }
   end
 
 end
