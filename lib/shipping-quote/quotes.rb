@@ -65,7 +65,7 @@ class Quote
       all_rates += ups_rates
     end
 
-    if country_key.include?('RL') && @truck_only.to_i > 0
+    if country_key.include?('RL') && @truck_only.to_i > 0 && destination[:country] != 'MX'
         rl = RLQuote.new(@cart_items, @config)
         rl_quote = (rl.freight_request(destination)).to_i
         # retry

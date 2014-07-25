@@ -205,7 +205,7 @@ class CreatePackages
     boxing_charge
   end
 
-  def add_packages(qty, weight, length=5, width=5, height=5)
+  def add_packages(qty, weight, length=10, width=10, height=10)
     (1..qty).each { @packages << Package.new((weight * 16), [length, width, height], :units => :imperial) }
   end
 

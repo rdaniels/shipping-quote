@@ -71,6 +71,19 @@ module ShippingQuote
         expect(quote).to be > 20
       end
 
+
+      it 'does not ship truck to MX' do       
+        item.stub(:shipCode).and_return('TRK') 
+        destination[:country] = 'MX'
+        destination[:postal_code] = '06140'
+        destination[:province] = 'DF'
+        destination[:city] = 'Mexico D.F.'
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        expect(quote.length).to eq(0)
+      end
+
       it 'Runner returns only Truck Shipping over $40 if shipCode = TRK' do
         item.stub(:shipCode).and_return('TRK')
         cart_items[0] = item

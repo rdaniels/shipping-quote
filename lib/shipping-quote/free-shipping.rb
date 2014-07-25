@@ -52,6 +52,7 @@ class FreeShipping
 
   def validate_location(destination)
     pass = true
+    return false if @config[:free_shipping][:free_ship_countries] == nil
     pass = false if !@config[:free_shipping][:free_ship_countries].include? destination[:country]
     pass = false if %w[AP AE AK HI PR VI].include? destination[:province]
     pass = false if %w[YT NT NU NL PE NS].include? destination[:province] #canada
