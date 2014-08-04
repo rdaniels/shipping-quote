@@ -6,12 +6,28 @@ module ShippingQuote
 
     config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
     let!(:cart_items) { [] }
-    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
+    let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, length: 13, width: 15, height: 13) }
     let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 20, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil) }
     let!(:destination) { {:country => 'US',:street => '1234 fake street', :province => 'FL', :city => 'Tampa', :postal_code => '33609'} }
 
 
     describe 'international runner' do
+        it 'ups returns service_code' do
+            destination[:country] = 'PL'
+            destination[:street] = 'Mostowa 15A'
+            destination[:postal_code] = '87-100'
+            destination[:province] = 'PL'
+            destination[:city] = 'Toru'
+            item.stub(:shipCode).and_return('SHA')
+            item.stub(:weight).and_return(14)
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            results = ship.runner(destination)    
+            has_usps = results.select{|key, value| key.to_s.match(/^UPS Worldwide Expedited/)}
+            expect(has_usps[0][2]).to eq('08')
+        end
+
+
       it 'returns USPS quote for VE with 5 digit zip' do
         destination[:country] = 'VE'
         destination[:postal_code] = '05030'
