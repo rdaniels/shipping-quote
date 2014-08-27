@@ -109,7 +109,7 @@ module ShippingQuote
         cart_items[0] = item
         ship = Shipping.new(cart_items, config)
         results = ship.runner(destination)
-        has_ups = results.select{|key, value| key.to_s.match(/^UPS Saver/)}
+        has_ups = results.select{|key, value| key.to_s.match(/^UPS Worldwide/)}
         expect(has_ups.length).to be > 0
         #puts results
       end

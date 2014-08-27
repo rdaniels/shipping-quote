@@ -84,6 +84,8 @@ class Quote
     if @config[:rate_multiplier].to_d != 1 && quotes != nil && quotes.length > 0
 
       quotes.each do |q|
+
+
         if q[0][0..4] == 'FedEx' && q[0][0..7] != 'FedEx Gr'  && @config[:fedex_express_multiplier].to_d != 1
           q[1] = q[1] * @config[:fedex_express_multiplier].to_d
 
@@ -95,6 +97,11 @@ class Quote
 
         elsif q[0] !=  'Truck Shipping'
           q[1] = q[1] * @config[:rate_multiplier].to_d
+        end
+
+
+        if q[0][0..3] == 'USPS' && @config[:usps_add_charge] != nil
+          q[1] = q[1] + (@config[:usps_add_charge].to_i * 100) if q[1] > 0
         end
       end
     end

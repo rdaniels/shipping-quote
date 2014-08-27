@@ -31,6 +31,21 @@ module ShippingQuote
       config[:first_class_weight_limit] = 0.5
       # config[:shown_rates] += ['USPS Priority Mail 1-Day','USPS Priority Mail 2-Day','USPS Priority Mail 3-Day','USPS Priority Mail 4-Day','USPS Priority Mail 5-Day','USPS First-Class Mail Parcel','USPS Media Mail']
 
+        it 'add $1 to usps shipping' do
+            config[:usps_add_charge] = 0
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            quote = ship.runner(destination)
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        
+            config[:usps_add_charge] = 1
+            cart_items[0] = item
+            ship = Shipping.new(cart_items, config)
+            quote = ship.runner(destination)
+            has_media2 = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            expect(has_media[0][1]+100).to eq(has_media2[0][1])
+        end
+
 
         it 'NPA items can not ship usps first class parcel' do
             item.stub(:weight).and_return(0.1)
@@ -96,7 +111,7 @@ module ShippingQuote
         media_before = filtered_quotes.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}[0][1].to_i
         new_quote = quote.multiplier(filtered_quotes)
         media_after = new_quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}[0][1].to_i
-        expect(media_after).to eq((media_before * config[:media_mail_multiplier]).to_i)
+        expect(media_after).to eq(((media_before * config[:media_mail_multiplier]).to_i) + (config[:usps_add_charge] * 100))
       end
 
       it 'media mail multiplier applied to media mail class' do
@@ -111,7 +126,7 @@ module ShippingQuote
         media_before = filtered_quotes.select{|key, value| key.to_s.match(/^USPS Media Mail/)}[0][1].to_i
         new_quote = quote.multiplier(filtered_quotes)
         media_after = new_quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}[0][1].to_i
-        expect(media_after).to eq((media_before * config[:media_mail_multiplier]).to_i)
+        expect(media_after).to eq(((media_before * config[:media_mail_multiplier]).to_i) + (config[:usps_add_charge] * 100))
       end
     end
 

@@ -54,6 +54,22 @@ module ShippingQuote
 
 
 
+      it '3 glass sheets' do
+        cart_items = [
+          {'ref01'=>"S329.6I", 'qty'=>'1', 'isGlass'=>'1', 'backorder'=>'0'},
+          {'ref01'=>"S339.6I", 'qty'=>'1', 'isGlass'=>'1', 'backorder'=>'0'},
+          {'ref01'=>"S843.92I", 'qty'=>'1', 'isGlass'=>'1', 'backorder'=>'0'}]
+        destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'NM', 'city'=>'Ruidoso', 'postal_code'=>'88345', 'price_class'=>'1' }
+        
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts ship.boxing_charge
+
+      end
+
 
       it 'dichro test' do
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'NY', 'city'=>'Baiting Hollow', 'postal_code'=>'11933', 'price_class'=>'1' }
@@ -66,7 +82,8 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
+
+        #puts results
       end
 
       it 'high number of glass flips to truck_only' do

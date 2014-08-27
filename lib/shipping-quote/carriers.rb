@@ -1,7 +1,8 @@
 require 'active_shipping'
 include ActiveSupport::Cache
 include ActiveMerchant::Shipping
-
+# cache = ActiveSupport::Cache::MemoryStore.new
+# cache.clear
 
 class PullCarriers
   attr_accessor :notes
