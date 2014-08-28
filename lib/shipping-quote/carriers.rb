@@ -16,8 +16,8 @@ class PullCarriers
 
   def pull_fedex (origin, location_destination, packages)
     cache_name = 'fedex' + packages_to_cache_name(location_destination, packages)
-
     fedex_rates = @cache.read(cache_name)
+
     if fedex_rates == nil || fedex_rates == []
       begin
         fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password], key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])

@@ -96,7 +96,7 @@ module ShippingQuote
         packages = CreatePackages.new(ship.cart_items, config, destination)
         my_box = packages.create_packages(ship.cart_items)
         expect(my_box.length).to eq(1)
-        expect(my_box[0].inches).to eq([5,5,5])
+        expect(my_box[0].inches).to eq([10,10,10])
       end
       it 'returns missing item weight in note and no packages' do
         item.stub(:weight).and_return(nil)

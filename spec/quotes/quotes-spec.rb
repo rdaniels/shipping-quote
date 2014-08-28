@@ -14,7 +14,6 @@ module ShippingQuote
 
      it 'returns blank when quote <= boxing charge'
 
-
      it 'returns fedex express saver and home ground' do
        cart_items[0] = item
        ship = Shipping.new(cart_items, config)

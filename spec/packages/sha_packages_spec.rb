@@ -18,7 +18,7 @@ module ShippingQuote
         expect(my_box[0].inches).to eq([7,8,9])
       end
 
-       it 'returns 2 sized package' do
+      it 'returns 2 sized package' do
         cart_items[0] = item
         cart_items[1] = item2
         ship = Shipping.new(cart_items, config)
@@ -26,6 +26,16 @@ module ShippingQuote
         my_box = packages.package_runner
         expect(my_box[0].inches).to eq([7,8,9])
         expect(my_box[1].inches).to eq([10,11,12])
+      end
+
+      it 'goes to default 10 x 10 x 10 if any size is 0' do
+        item.stub(:length).and_return(0)
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = CreatePackages.new(ship.cart_items, config, destination)
+        my_box = packages.package_runner
+        # puts my_box[0].inches
+        expect(my_box[0].inches).to eq([10,10,10])
       end
     end
   end

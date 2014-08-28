@@ -127,8 +127,8 @@ class CreatePackages
     elsif remaining_pieces > 0
       box_small = 1
     end
-    add_packages(box_small, @config[:sm_box_weight]) if box_small > 0
-    add_packages(box_large, @config[:sm_box2_weight]) if box_large > 0
+    add_packages(box_small, @config[:sm_box_weight], 16, 8, 18) if box_small > 0
+    add_packages(box_large, @config[:sm_box2_weight], 17, 16, 19) if box_large > 0
     return [box_small, box_large]
 
   end
@@ -145,8 +145,8 @@ class CreatePackages
     elsif remaining_pieces > 0
       box_small = 1
     end
-    add_packages(box_small, @config[:lg_box_weight]) if box_small > 0
-    add_packages(box_large, @config[:lg_box2_weight]) if box_large > 0
+    add_packages(box_small, @config[:lg_box_weight], 29, 8, 27) if box_small > 0
+    add_packages(box_large, @config[:lg_box2_weight], 32, 8, 26) if box_large > 0
     return [box_small, box_large]
   end
 

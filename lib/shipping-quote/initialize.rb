@@ -38,9 +38,15 @@ module ShippingQuote
           item.define_singleton_method(:ormd) { nil } if !defined? item.ormd
           item.define_singleton_method(:glassConverter) { nil } if !defined? item.glassConverter
           item.define_singleton_method(:freeShipping) { nil } if !defined? item.freeShipping
-          item.define_singleton_method(:length) { 5 } if !defined? item.length
-          item.define_singleton_method(:width) { 5 } if !defined? item.width
-          item.define_singleton_method(:height) { 5 } if !defined? item.height
+          item.define_singleton_method(:length) { 10 } if !defined? item.length
+          item.define_singleton_method(:width) { 10 } if !defined? item.width
+          item.define_singleton_method(:height) { 10 } if !defined? item.height
+
+          if item.shipCode == 'SHA' && (item.length == 0 || item.width == 0 || item.height == 0)            
+            item.stub(:length).and_return(10)
+            item.stub(:height).and_return(10)
+            item.stub(:width).and_return(10)
+          end
       end
     end
 
