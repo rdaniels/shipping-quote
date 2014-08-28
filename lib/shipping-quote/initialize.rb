@@ -58,6 +58,7 @@ module ShippingQuote
       @boxing_charge = ship.boxing
       destination['province'] = 'VI' if destination['country'] == 'VI'
       destination['country'] = 'US' if destination['country'] == 'VI'
+      destination['province'] = '' if destination['province'].class == FalseClass
 
       if destination['country'] == 'US' && destination['province'].length > 2
         destination['province'] =  States.names_abbreviation_map[destination['province'].titleize]
