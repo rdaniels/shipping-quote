@@ -23,7 +23,7 @@ class RLQuote
       "weight1" => get_weight.to_f,
       "delnotify" => 'X',
       "hazmat" => check_ormd,
-      "resdel" => residential
+      "resdel" => 'X' #residential
     }
 
     begin
@@ -40,13 +40,6 @@ class RLQuote
         @notes ='Truck Quote not available'
         0
     end
-    # begin
-    #   res = http_get("www.rlcarriers.com", path, params)
-    #   my_hash = Hash.from_xml(res)
-    #   my_hash ['xml']['ratequote']['netcharges'].gsub('$','').to_d
-    # rescue => error
-    #   0
-    # end
 
   end
 

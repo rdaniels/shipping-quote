@@ -32,8 +32,6 @@ module ShippingQuote
       d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
 
 
-
-
       it 'returns FedEx express saver and home ground' do
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
@@ -104,7 +102,7 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
+        expect(ship.notes.length).to be > 0 
       end
 
       it 'gift card check' do
@@ -250,7 +248,7 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts results
+        expect(results.length).to be > 0
       end
 
 

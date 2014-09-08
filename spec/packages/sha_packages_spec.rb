@@ -37,6 +37,18 @@ module ShippingQuote
         # puts my_box[0].inches
         expect(my_box[0].inches).to eq([10,10,10])
       end
+
+
+
+      it 'handles size with string datatype' do
+        item.stub(:length).and_return('40')
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        packages = CreatePackages.new(ship.cart_items, config, destination)
+        my_box = packages.package_runner
+        puts my_box[0].inches
+        #expect(my_box[0].inches).to eq([10,10,10])
+      end
     end
   end
 end
