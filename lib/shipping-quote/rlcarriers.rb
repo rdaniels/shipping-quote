@@ -16,6 +16,9 @@ class RLQuote
 
   def freight_request(destination)
     path = '/b2brateparam.asp'
+    residential = 'X'
+    residential = '' if destination[:commercial] && %w(1 Y y).include?(destination[:commercial])
+
     params = {"id" => "5173944631",
       "origin" => "48910",
       "dest" => destination[:postal_code].to_s.split('-').first,
@@ -23,7 +26,7 @@ class RLQuote
       "weight1" => get_weight.to_f,
       "delnotify" => 'X',
       "hazmat" => check_ormd,
-      "resdel" => 'X' #residential
+      "resdel" => residential
     }
 
     begin

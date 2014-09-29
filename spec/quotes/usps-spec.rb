@@ -36,13 +36,12 @@ module ShippingQuote
             cart_items[0] = item
             ship = Shipping.new(cart_items, config)
             quote = ship.runner(destination)
-            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
-        
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
             config[:usps_add_charge] = 1
             cart_items[0] = item
             ship = Shipping.new(cart_items, config)
             quote = ship.runner(destination)
-            has_media2 = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            has_media2 = quote.select{|key, value| key.to_s.match(/^USPS Priority Mail/)}
             expect(has_media[0][1]+100).to eq(has_media2[0][1])
         end
 

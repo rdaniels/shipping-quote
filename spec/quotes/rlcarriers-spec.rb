@@ -30,6 +30,22 @@ module ShippingQuote
       config[:free_shipping] = {}
 
 
+      it 'calculates commercial to CA' do
+        item.stub(:shipCode).and_return('TRK') 
+        destination[:country] = 'CA'
+        destination[:postal_code] = 'G0L1A0'
+        destination[:province] = 'QB'
+        destination[:city] = 'Eastern Quebec'
+        destination[:commercial] = 'N'
+        cart_items[0] = item
+        ship = Shipping.new(cart_items, config)
+        quote = ship.runner(destination)
+        destination[:commercial] = 'Y'
+        quote2 = ship.runner(destination)
+        expect(quote[0][1]).to be > quote2[0][1]
+      end
+
+
       it 'returns ship calss 65 for 30 or more sheets of glass' do
         item.stub(:ref01).and_return('s100rr-lg')
         item2.stub(:ref01).and_return('s100g-sht')
