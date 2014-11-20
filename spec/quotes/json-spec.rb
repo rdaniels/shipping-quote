@@ -326,6 +326,30 @@ module ShippingQuote
       end
 
 
+      it 'tests free shipping' do
+        destination = {"allow_free_ship"=>true,"price_class"=>1,"province"=>"FL","country"=>"US","postal_code"=>"33626-3348","city"=>"","street"=>"","commercial"=>"N","street2"=>""}
+        cart_items = [
+          {"shipCode"=>"UPS","glassConverter"=>"","weight"=>1.0,"qty"=>1,"ref01"=>425270,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"UPS","glassConverter"=>"","weight"=>1.0,"qty"=>1,"ref01"=>425270,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"UPS","glassConverter"=>3,"weight"=>0.0,"qty"=>3,"ref01"=>"S1009-MD","backorder"=>0,"ormd"=>"","freeShipping"=>1,"isGlass"=>1},
+          {"shipCode"=>"UPS","glassConverter"=>"","weight"=>1.06,"qty"=>1,"ref01"=>5470,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"LEA","glassConverter"=>"","weight"=>0.31,"qty"=>2,"ref01"=>5602,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"UPS","glassConverter"=>"","weight"=>3.0,"qty"=>1,"ref01"=>4804,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"UPS","glassConverter"=>"","weight"=>0.19,"qty"=>1,"ref01"=>5208,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"GLA","glassConverter"=>"","weight"=>6.0,"qty"=>1,"ref01"=>5381,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"GLA","glassConverter"=>"","weight"=>12.0,"qty"=>1,"ref01"=>5366,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"GLA","glassConverter"=>"","weight"=>6.0,"qty"=>1,"ref01"=>5373,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0},
+          {"shipCode"=>"GLA","glassConverter"=>"","weight"=>6.0,"qty"=>1,"ref01"=>5375,"backorder"=>0,"ormd"=>0,"freeShipping"=>1,"isGlass"=>0}
+        ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts results
+        # expect(results.length).to be > 1
+      end 
+
     end
   end
 end

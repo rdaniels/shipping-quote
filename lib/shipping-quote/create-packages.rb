@@ -91,7 +91,6 @@ class CreatePackages
     dichro_boxes = dichro_packages(cart_items)
     #special_order
 
-
     @boxing += calculate_boxing(lead_box, add_small_glass_boxes, add_large_glass_boxes, dichro_boxes)
     @packages = [] if @notes != nil
     @packages
@@ -183,10 +182,10 @@ class CreatePackages
     dichro_boxes = 0 if dichro_boxes == nil
     large_glass_boxes -= dichro_boxes if large_glass_boxes >= dichro_boxes && @config[:dichro_box_charge].to_d == 0
 
-    if large_glass_boxes > 6 || @truck_only > 0
-      boxing_charge = 0
+    #if large_glass_boxes > 6 || @truck_only > 0
+      # boxing_charge = 0
 
-    elsif @config[:add_boxing_charge] == true
+    if @config[:add_boxing_charge] == true
       boxing_charge += @config[:lead_box_charge].to_d if add_lead_box > 0
       boxing_charge += @config[:first_glass_box_extra_charge] if small_glass_boxes > 0 || large_glass_boxes > 0 # $15 for first glass box, $8 each additional
       boxing_charge += (large_glass_boxes * @config[:lg_glass_box_charge].to_d)

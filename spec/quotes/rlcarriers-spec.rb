@@ -114,6 +114,19 @@ module ShippingQuote
         #puts quote
       end
 
+      it 'Glass triggered truck' do
+        destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'MI', 'city'=>'Charlevoix', 'postal_code'=>'49720-1101', 'price_class'=>'1' }
+        cart_items = [{ 'qty'=>'40', 'ref01'=>'S100SDY-LG', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'0', 'isGlass'=>'1', 'shipCode'=>'LRG', 'freeShipping'=>'0' } ]
+        c_hash = []
+        cart_items.each {|item| c_hash << Hashit.new(item) }
+        d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
+        ship = Shipping.new(c_hash, config)
+        results = ship.runner(d_symbol)
+        puts ship.boxing_charge
+        # has_fedex = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
+        expect(ship.boxing_charge).to be > 1
+      end
+
     end
   end
 end
