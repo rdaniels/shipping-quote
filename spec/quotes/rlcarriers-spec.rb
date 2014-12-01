@@ -122,8 +122,6 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        puts ship.boxing_charge
-        # has_fedex = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
         expect(ship.boxing_charge).to be > 1
       end
 

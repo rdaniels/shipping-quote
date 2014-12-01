@@ -1,6 +1,8 @@
 require 'active_shipping'
+require 'timeout'
 include ActiveSupport::Cache
 include ActiveMerchant::Shipping
+
 # cache = ActiveSupport::Cache::MemoryStore.new
 # cache.clear
 
@@ -20,12 +22,18 @@ class PullCarriers
 
     if fedex_rates == nil || fedex_rates == []
       begin
-        fedex = FedEx.new(login: @config[:fedex][:login], password: @config[:fedex][:password], key: @config[:fedex][:key], account: @config[:fedex][:account], meter: @config[:fedex][:meter])
-        response = fedex.find_rates(origin, location_destination, packages)
+        Timeout::timeout(15) {
+          fedex = FedEx.new(login: @config[:fedex][:login],
+           password: @config[:fedex][:password],
+           key: @config[:fedex][:key],
+           account: @config[:fedex][:account],
+           meter: @config[:fedex][:meter],
+           read_timeout: 10)
+          response = fedex.find_rates(origin, location_destination, packages)
+        }
         fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price, rate.delivery_range] }
         @cache.write(cache_name, fedex_rates, :expires_in => 48.hours)
-      rescue #=> error
-        #raise error
+      rescue
         fedex_rates = []
         @notes << 'FedEx can not produce quote at this time' # + error.response.message
       end
@@ -40,8 +48,10 @@ class PullCarriers
     usps_rates = @cache.read(cache_name)
     if usps_rates == nil || usps_rates == []
       begin
-        usps = USPS.new(login: @config[:usps][:login])
-        response = usps.find_rates(origin, location_destination, packages)
+        Timeout::timeout(15) {
+          usps = USPS.new(login: @config[:usps][:login])
+          response = usps.find_rates(origin, location_destination, packages)
+        }
         usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price, rate.delivery_range] }
         @cache.write(cache_name, usps_rates, :expires_in => 72.hours)
       rescue #=> error
@@ -60,8 +70,10 @@ class PullCarriers
     ups_rates = @cache.read(cache_name)
     if ups_rates == nil || ups_rates == []
       begin
-        ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
-        response = ups.find_rates(origin, location_destination, packages)
+        Timeout::timeout(15) {
+          ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
+          response = ups.find_rates(origin, location_destination, packages)
+        }
         ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.negotiated_rate == 0 ? rate.price : rate.negotiated_rate, rate.service_code, rate.delivery_range] } #rate.price
 
         @cache.write(cache_name, ups_rates, :expires_in => 48.hours)
