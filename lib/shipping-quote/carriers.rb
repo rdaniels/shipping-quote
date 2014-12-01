@@ -1,5 +1,5 @@
 require 'active_shipping'
-require 'timeout'
+# require 'timeout'
 include ActiveSupport::Cache
 include ActiveMerchant::Shipping
 
@@ -22,7 +22,7 @@ class PullCarriers
 
     if fedex_rates == nil || fedex_rates == []
       begin
-        Timeout::timeout(15) {
+        # Timeout::timeout(15) {
           fedex = FedEx.new(login: @config[:fedex][:login],
            password: @config[:fedex][:password],
            key: @config[:fedex][:key],
@@ -30,7 +30,7 @@ class PullCarriers
            meter: @config[:fedex][:meter],
            read_timeout: 10)
           response = fedex.find_rates(origin, location_destination, packages)
-        }
+        # }
         fedex_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price, rate.delivery_range] }
         @cache.write(cache_name, fedex_rates, :expires_in => 48.hours)
       rescue
@@ -48,10 +48,10 @@ class PullCarriers
     usps_rates = @cache.read(cache_name)
     if usps_rates == nil || usps_rates == []
       begin
-        Timeout::timeout(15) {
+        # Timeout::timeout(15) {
           usps = USPS.new(login: @config[:usps][:login])
           response = usps.find_rates(origin, location_destination, packages)
-        }
+        # }
         usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price, rate.delivery_range] }
         @cache.write(cache_name, usps_rates, :expires_in => 72.hours)
       rescue #=> error
@@ -70,10 +70,10 @@ class PullCarriers
     ups_rates = @cache.read(cache_name)
     if ups_rates == nil || ups_rates == []
       begin
-        Timeout::timeout(15) {
+        # Timeout::timeout(15) {
           ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
           response = ups.find_rates(origin, location_destination, packages)
-        }
+        # }
         ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.negotiated_rate == 0 ? rate.price : rate.negotiated_rate, rate.service_code, rate.delivery_range] } #rate.price
 
         @cache.write(cache_name, ups_rates, :expires_in => 48.hours)
