@@ -205,7 +205,7 @@ class CreatePackages
   end
 
   def add_packages(qty, weight, length=10, width=10, height=10)
-    (1..qty).each { @packages << ActiveShipping::Package.new((weight * 16), [length.to_i, width.to_i, height.to_i], :units => :imperial) }
+    (1..qty).each { @packages << ActiveShipping::Package.new((weight * 16), [length.to_i, width.to_i, height.to_i], :units => :imperial, container: :variable) }
   end
 
 end

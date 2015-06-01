@@ -42,7 +42,7 @@ module ShippingQuote
           item.define_singleton_method(:width) { 10 } if !defined? item.width
           item.define_singleton_method(:height) { 10 } if !defined? item.height
 
-          if item.shipCode == 'SHA' && (item.length == 0 || item.width == 0 || item.height == 0)            
+          if item.shipCode == 'SHA' && (item.length == 0 || item.width == 0 || item.height == 0)
             item.stub(:length).and_return(10)
             item.stub(:height).and_return(10)
             item.stub(:width).and_return(10)
@@ -130,7 +130,7 @@ module ShippingQuote
       @cart_items.each do |item|
         if item.isGlass.to_i == 1
           isku = item.ref01.downcase
-          if isku.include?('-sm') || isku.include?('-md') 
+          if isku.include?('-sm') || isku.include?('-md')
           elsif isku.include?('-lg')
             count_glass += item.qty.to_i
           else

@@ -102,7 +102,7 @@ module ShippingQuote
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
-        expect(ship.notes.length).to be > 0 
+        expect(ship.notes.length).to be > 0
       end
 
       it 'gift card check' do
@@ -237,10 +237,10 @@ module ShippingQuote
 
 
       it 'computes glass correctly' do
-       
+
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', "pricemode"=>"R", "province"=>"FL", "postal_code"=>"33609", "cardCode"=>"9833025", "shipToCode"=>"Tammy Menear"}
         cart_items = [
-          {"cartPrice"=>" 7.6500", "qty"=>"3.000000", "ref01"=>"9661", "freeShipping"=>"2", "weight"=>"0.13"}, 
+          {"cartPrice"=>" 7.6500", "qty"=>"3.000000", "ref01"=>"9661", "freeShipping"=>"2", "weight"=>"0.13"},
           {"cartPrice"=>" 22.4500", "qty"=>"35.000000", "ref01"=>"A01479S-LG", "glassConverter"=>"4", "freeShipping"=>"0", "weight"=>"0", "isGlass"=>"1", "shipCode"=>"GLA"}
         ]
         c_hash = []
@@ -276,7 +276,7 @@ module ShippingQuote
         expect(results.length).to be > 0
       end
 
-      
+
       it 'p. o. box does not return fedex'  do
         destination = {'country'=>'US', 'street'=>'P. O. Box 5884', 'street2'=>'', 'province'=>'Az', 'city'=>'Glendale', 'postal_code'=>'85312', 'price_class'=>'1' }
         cart_items = [
@@ -348,7 +348,7 @@ module ShippingQuote
         results = ship.runner(d_symbol)
         puts results
         # expect(results.length).to be > 1
-      end 
+      end
 
     end
   end
