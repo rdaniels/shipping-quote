@@ -1,7 +1,7 @@
 require 'active_shipping'
 # require 'timeout'
 include ActiveSupport::Cache
-include ActiveMerchant::Shipping
+# include ActiveMerchant::Shipping
 
 # cache = ActiveSupport::Cache::MemoryStore.new
 # cache.clear
@@ -23,7 +23,7 @@ class PullCarriers
     if fedex_rates == nil || fedex_rates == []
       begin
         # Timeout::timeout(15) {
-          fedex = FedEx.new(login: @config[:fedex][:login],
+          fedex = ActiveShipping::FedEx.new(login: @config[:fedex][:login],
            password: @config[:fedex][:password],
            key: @config[:fedex][:key],
            account: @config[:fedex][:account],
@@ -49,7 +49,7 @@ class PullCarriers
     if usps_rates == nil || usps_rates == []
       begin
         # Timeout::timeout(15) {
-          usps = USPS.new(login: @config[:usps][:login])
+          usps = ActiveShipping::USPS.new(login: @config[:usps][:login])
           response = usps.find_rates(origin, location_destination, packages)
         # }
         usps_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.price, rate.delivery_range] }
@@ -71,7 +71,7 @@ class PullCarriers
     if ups_rates == nil || ups_rates == []
       begin
         # Timeout::timeout(15) {
-          ups = UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
+          ups = ActiveShipping::UPS.new(login: @config[:ups][:login], password: @config[:ups][:password], key: @config[:ups][:key], origin_account: @config[:ups][:account])
           response = ups.find_rates(origin, location_destination, packages)
         # }
         ups_rates = response.rates.sort_by(&:price).collect { |rate| [rate.service_name, rate.negotiated_rate == 0 ? rate.price : rate.negotiated_rate, rate.service_code, rate.delivery_range] } #rate.price

@@ -1,5 +1,5 @@
 require 'active_shipping'
-include ActiveMerchant::Shipping
+# include ActiveMerchant::Shipping
 require_relative 'carriers'
 
 
@@ -23,11 +23,11 @@ class Quote
   def quotes(destination, packages, ship_selected=nil)
     all_rates = []
     c = PullCarriers.new(@config)
-    origin = Location.new(@config[:origin])
+    origin = ActiveShipping::Location.new(@config[:origin])
     destination[:country] = 'US' if ['United States','USA'].include? destination[:country]
     destination[:country] = 'CA' if ['Canada'].include? destination[:country]
     destination[:province] = '' if destination[:province].downcase == 'international'
-    location_destination = Location.new(destination)
+    location_destination = ActiveShipping::Location.new(destination)
 
     country_key = %w(USPS FedEx)
     country_key = @config[:us_carriers] if @config[:us_carriers] != nil
