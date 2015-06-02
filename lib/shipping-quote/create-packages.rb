@@ -153,7 +153,7 @@ class CreatePackages
   def lead_packages(cart_items)
     lead_weight = 0
     cart_items.each do |item|
-      lead_weight += (item.qty * item.weight) if item.shipCode != nil && item.shipCode.upcase == 'LEA'
+      lead_weight += (item.qty.to_d * item.weight) if item.shipCode != nil && item.shipCode.upcase == 'LEA'
     end
     lead_weight = @config[:box_lead_weight] if lead_weight < @config[:box_lead_weight] && lead_weight > 0
     add_packages(1, lead_weight) if lead_weight > 0

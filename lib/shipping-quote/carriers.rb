@@ -44,7 +44,6 @@ class PullCarriers
 
   def pull_usps (origin, location_destination, packages)
     cache_name = 'usps' + packages_to_cache_name(location_destination, packages)
-
     usps_rates = @cache.read(cache_name)
     if usps_rates == nil || usps_rates == []
       begin
@@ -59,7 +58,6 @@ class PullCarriers
         @notes << 'USPS can not produce quotes at this time' # + error.response.message
       end
     end
-
     usps_rates
   end
 
