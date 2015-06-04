@@ -101,7 +101,7 @@ module ShippingQuote
         expect(quote.length).to eq(0)
       end
 
-      it 'Runner returns only Truck Shipping over $40 if shipCode = TRK' do
+      it 'Runner returns only Truck Shipping over $60 if shipCode = TRK' do
         item.stub(:shipCode).and_return('TRK')
         cart_items[0] = item
         cart_items[1] = item2
@@ -124,6 +124,9 @@ module ShippingQuote
         ship = Shipping.new(c_hash, config)
         results = ship.runner(d_symbol)
         expect(ship.boxing_charge).to be > 1
+
+        has_truck= results.select{|key, value| key.to_s.match(/^Truck Shipping/)}
+        expect(has_truck.length).to eq(1)
       end
 
     end
