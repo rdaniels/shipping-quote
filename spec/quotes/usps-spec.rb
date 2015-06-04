@@ -1,5 +1,4 @@
 require 'spec_helper'
-#require 'pry'
 
 module ShippingQuote
   describe Shipping do
@@ -53,7 +52,7 @@ module ShippingQuote
             ship = Shipping.new(cart_items, config)
             quote = ship.runner(destination)
             has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
-            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
             expect(has_first.length).to eq(0)
             expect(has_media.length).to eq(0)
             expect(quote.length).to be > 0
@@ -66,7 +65,7 @@ module ShippingQuote
             ship = Shipping.new(cart_items, config)
             quote = ship.runner(destination)
             has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
-            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+            has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
             expect(has_first.length).to eq(0)
             expect(has_media.length).to eq(0)
             expect(quote.length).to be > 0
@@ -81,7 +80,7 @@ module ShippingQuote
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
         has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
-        has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
 
         expect(has_first.length).to eq(1)
         expect(has_media.length).to eq(1)
@@ -93,7 +92,7 @@ module ShippingQuote
         ship = Shipping.new(cart_items, config)
         quote = ship.runner(destination)
         has_first = quote.select{|key, value| key.to_s.match(/^USPS First-Class Mail Parcel/)}
-        has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        has_media = quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
         expect(has_first.length).to eq(0)
         expect(has_media.length).to eq(1)
       end
@@ -122,9 +121,9 @@ module ShippingQuote
         quotes = quote.quotes(destination, packages)
         filter = FilterShipping.new(cart_items,config)
         filtered_quotes = filter.filter_shipping(quotes, destination )
-        media_before = filtered_quotes.select{|key, value| key.to_s.match(/^USPS Media Mail/)}[0][1].to_i
+        media_before = filtered_quotes.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}[0][1].to_i
         new_quote = quote.multiplier(filtered_quotes)
-        media_after = new_quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}[0][1].to_i
+        media_after = new_quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}[0][1].to_i
         expect(media_after).to eq(((media_before * config[:media_mail_multiplier]).to_i) + (config[:usps_add_charge] * 100))
       end
     end

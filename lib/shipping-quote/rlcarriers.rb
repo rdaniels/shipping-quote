@@ -49,21 +49,21 @@ class RLQuote
   def ship_class
     x = 70
     kiln = @cart_items.find_all do |item|
-      if item.respond_to? :name 
-        item.name != nil && item.name.match(/kiln/) && item.weight > 15 
+      if item.respond_to? :name
+        item.name != nil && item.name.match(/kiln/) && item.weight > 15
       end
     end
     x = 85 if kiln.length > 0
 
     large_sheet = @cart_items.find_all do |item|
       ref01 = item.ref01.to_s
-     (ref01.downcase.match(/-lg/) || ref01.downcase.match(/-sht/)) && item.isGlass.to_s.to_i == 1 
+     (ref01.downcase.match(/-lg/) || ref01.downcase.match(/-sht/)) && item.isGlass.to_s.to_i == 1
     end
     #sum = large_sheet.map(&:qty).inject(0, &:+)
     sum = 0
     large_sheet.each { |item| sum += item.qty.to_i }
 
-    x = 65 if sum >= 30
+    x = 77.5 if sum >= 30
 
     lead = @cart_items.find_all { |item| item.shipCode == 'LEA' }
     x = 60 if lead.length > 0 && x == 70
@@ -85,15 +85,20 @@ class RLQuote
 
   def get_weight(sm_glass_pieces=0, lg_glass_pieces=0)
     weight = 0
+    sht_qty = 0
     @cart_items.each do |item|
       weight += item.weight.to_d * item.qty.to_i if item.weight != nil
       sm_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.downcase.match(/-sm/)
       sm_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.downcase.match(/-md/)
       lg_glass_pieces += item.qty.to_i if item.isGlass.to_i == 1 && item.ref01.to_s.downcase.match(/-lg/)
-      lg_glass_pieces += item.qty.to_i * 2 if item.isGlass.to_i == 1 && item.ref01.to_s.downcase.match(/-sht/)
+      if item.isGlass.to_i == 1 && item.ref01.to_s.downcase.match(/-sht/)
+        lg_glass_pieces += item.qty.to_i * 2
+        sht_qty += item.qty.to_i
+      end
     end
     weight += sm_glass_pieces * 2
     weight += lg_glass_pieces * 5
-    weight
+    weight += 65 if sht_qty >= 40
+    weight + 70
   end
 end

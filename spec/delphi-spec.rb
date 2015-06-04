@@ -47,7 +47,7 @@ module ShippingQuote
         results = ship.runner(destination)
         has_express = results.select{|key, value| key.to_s.match(/^FedEx Express Saver/)}
         has_ground = results.select{|key, value| key.to_s.match(/^FedEx Ground/)}
-        has_media = results.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        has_media = results.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
         expect(has_express.length).to eq(1)
         expect(has_ground.length).to eq(1)
         expect(has_media.length).to eq(0)

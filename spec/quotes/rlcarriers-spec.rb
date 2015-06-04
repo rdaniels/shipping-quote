@@ -31,7 +31,7 @@ module ShippingQuote
 
 
       it 'calculates commercial to CA' do
-        item.stub(:shipCode).and_return('TRK') 
+        item.stub(:shipCode).and_return('TRK')
         destination[:country] = 'CA'
         destination[:postal_code] = 'G0L1A0'
         destination[:province] = 'QB'
@@ -46,7 +46,7 @@ module ShippingQuote
       end
 
 
-      it 'returns ship calss 65 for 30 or more sheets of glass' do
+      it 'returns ship calss 77.5 for 30 or more sheets of glass' do
         item.stub(:ref01).and_return('s100rr-lg')
         item2.stub(:ref01).and_return('s100g-sht')
         item.stub(:isGlass).and_return(1)
@@ -54,7 +54,7 @@ module ShippingQuote
         (0..20).each { |i| cart_items[i] = item }
         (21..30).each { |i| cart_items[i] = item2 }
         ship = RLQuote.new(cart_items, config)
-        expect(ship.ship_class).to eq(65)
+        expect(ship.ship_class).to eq(77.5)
       end
 
       it 'returns shipping quote greater than $20' do
@@ -64,16 +64,17 @@ module ShippingQuote
         expect(quote).to be > 20
       end
 
-      it 'calculates 60 lbs shipping' do
+      it 'calculates 130 lbs shipping' do
         item.stub(:qty).and_return(5)
         item.stub(:weight).and_return(6)
         item2.stub(:qty).and_return(3)
         item2.stub(:weight).and_return(10)
+        # adds 70 lbs pallet fee
         cart_items[0] = item
         cart_items[1] = item2
 
         ship = RLQuote.new(cart_items, config)
-        expect(ship.get_weight).to eq(60)
+        expect(ship.get_weight).to eq(130)
       end
 
       it 'truck handle ref01 as fixnum' do
@@ -81,15 +82,15 @@ module ShippingQuote
           {"shipCode"=>"TRK", "glassConverter"=>"", "weight"=>50, "qty"=>1, "ref01"=>3000, "backorder"=>0, "ormd"=>"", "freeShipping"=>0, "isGlass"=>""}
         ]
         c_hash = []
-        cart_items.each {|item| c_hash << Hashit.new(item) }        
+        cart_items.each {|item| c_hash << Hashit.new(item) }
         ship = RLQuote.new(c_hash, config)
         quote = ship.freight_request(destination)
         expect(quote).to be > 20
       end
 
 
-      it 'does not ship truck to MX' do       
-        item.stub(:shipCode).and_return('TRK') 
+      it 'does not ship truck to MX' do
+        item.stub(:shipCode).and_return('TRK')
         destination[:country] = 'MX'
         destination[:postal_code] = '06140'
         destination[:province] = 'DF'
@@ -109,14 +110,14 @@ module ShippingQuote
         quote = ship.runner(destination)
         expect(quote[0][0]).to eq('Truck Shipping')
         expect(quote.length).to eq(1)
-        expect(quote[0][1]).to be > 4000
-        expect(quote[0][1]).to be < 20000
-        #puts quote
+        expect(quote[0][1]).to be > 6000
+        expect(quote[0][1]).to be < 40_000
+        # puts quote
       end
 
       it 'Glass triggered truck' do
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'MI', 'city'=>'Charlevoix', 'postal_code'=>'49720-1101', 'price_class'=>'1' }
-        cart_items = [{ 'qty'=>'40', 'ref01'=>'S100SDY-LG', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'0', 'isGlass'=>'1', 'shipCode'=>'LRG', 'freeShipping'=>'0' } ]
+        cart_items = [{ 'qty'=>'40', 'ref01'=>'S100SDY-SHT', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'0', 'isGlass'=>'1', 'shipCode'=>'LRG', 'freeShipping'=>'0' } ]
         c_hash = []
         cart_items.each {|item| c_hash << Hashit.new(item) }
         d_symbol = destination.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}

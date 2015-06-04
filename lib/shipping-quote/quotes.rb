@@ -89,7 +89,7 @@ class Quote
         if q[0][0..4] == 'FedEx' && q[0][0..7] != 'FedEx Gr'  && @config[:fedex_express_multiplier].to_d != 1
           q[1] = q[1] * @config[:fedex_express_multiplier].to_d
 
-        elsif q[0] == 'USPS Media Mail' && @config[:media_mail_multiplier].to_d != 1
+        elsif q[0] == 'USPS Media Mail Parcel' && @config[:media_mail_multiplier].to_d != 1
           q[1] = q[1] * @config[:media_mail_multiplier].to_d
 
         elsif q[0] == 'USPS First-Class Mail Parcel' && @config[:media_mail_multiplier].to_d != 1

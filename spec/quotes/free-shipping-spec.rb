@@ -16,7 +16,7 @@ module ShippingQuote
       @config = YAML::load(IO.read("./shipping-quote-delphi.yml"))
       @config[:free_shipping][:end_date] = '05-05-2050'
     end
-    
+
     let!(:cart_items) { [] }
     let!(:item) { double('item', ref01: '3000', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 1, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: 2) }
     let!(:item2) { double('item', ref01: 'ab123', shipCode: 'UPS', isGlass: nil, qty: 1, weight: 5, backorder: 0, vendor: 10, ormd: nil, glassConverter: nil, freeShipping: nil) }
@@ -36,7 +36,7 @@ module ShippingQuote
         quote = ship.runner(d_symbol)
         expect(ship.lowest_priced).to eq('USPS Priority Mail')
       end
-      
+
       it 'free shipping on glass triggered truck' do
         destination = {'country'=>'US', 'street'=>'31 Cliff Way', 'street2'=>'', 'province'=>'MI', 'city'=>'Charlevoix', 'postal_code'=>'49720-1101', 'price_class'=>'1' }
         cart_items = [{ 'qty'=>'40', 'ref01'=>'S100SDY-LG', 'backorder'=>'0', 'ormd'=>'', 'glassConverter'=> '3', 'weight'=>'0', 'isGlass'=>'1', 'shipCode'=>'LRG', 'freeShipping'=>'1' } ]
@@ -81,7 +81,7 @@ module ShippingQuote
         expect(has_fedex[0][1]).to be > 0
       end
 
-      it 'allow_free_ship = false blocks free shipping' do    
+      it 'allow_free_ship = false blocks free shipping' do
         item.stub(:freeShipping).and_return(1)
         cart_items[0] = item
         ship = Shipping.new(cart_items, @config)
@@ -90,7 +90,7 @@ module ShippingQuote
         expect(has_fedex[0][1]).to be > 5
       end
 
-      it 'allows free shipping to canada BC' do    
+      it 'allows free shipping to canada BC' do
         destination[:price_class] = 1
         destination[:country] = 'CA'
         destination[:postal_code] = 'V8L 5N6'
@@ -104,7 +104,7 @@ module ShippingQuote
       end
 
 
-      it 'no free shipping to canada YT' do   
+      it 'no free shipping to canada YT' do
         destination[:country] = 'CA'
         destination[:postal_code] = 'Y1A 1A3'
         destination[:province] = 'YT'
@@ -161,7 +161,7 @@ module ShippingQuote
         cart_items[0] = item
         ship = Shipping.new(cart_items, @config)
         quote = ship.runner(destination)
-        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Media Mail/)}
+        has_usps = quote.select{|key, value| key.to_s.match(/^USPS Media Mail Parcel/)}
         expect(has_usps[0][1]).to eq(0)
         expect(quote.length).to be > 1
       end

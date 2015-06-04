@@ -18,7 +18,7 @@ class FilterShipping
       elsif ship_selected != nil
         quotes.delete_if { |a| !a.to_s.match(/#{ship_selected}/) }
       end
-      quotes.delete_if { |a| a.to_s.match(/USPS Media Mail/) } if allow_media_mail == false
+      quotes.delete_if { |a| a.to_s.match(/USPS Media Mail Parcel/) } if allow_media_mail == false
       quotes.delete_if { |a| a.to_s.match(/USPS First-Class Mail Parcel/) } if allow_first_class == false
       quotes.each do |q|
         shown_rates << q if @config[:shown_rates].include? q[0]
